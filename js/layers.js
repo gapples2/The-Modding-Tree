@@ -1,7 +1,7 @@
-addLayer("c", {
-        layer: "c", // This is assigned automatically, both to the layer and all upgrades, etc. Shown here so you know about it
-        name: "Candies", // This is optional, only used in a few places, If absent it just uses the layer id.
-        symbol: "C", // This appears on the layer's node. Default is the id with the first letter capitalized
+addLayer("b", {
+        layer: "b", // This is assigned automatically, both to the layer and all upgrades, etc. Shown here so you know about it
+        name: "Basic", // This is optional, only used in a few places, If absent it just uses the layer id.
+        symbol: "B", // This appears on the layer's node. Default is the id with the first letter capitalized
         position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: true,
@@ -13,8 +13,8 @@ addLayer("c", {
         }},
         color: "#4BDC13",
         requires: new Decimal(10), // Can be a function that takes requirement increases into account
-        resource: "lollipops", // Name of prestige currency
-        baseResource: "candies", // Name of resource prestige is based on
+        resource: "Basic Points", // Name of prestige currency
+        baseResource: "Work", // Name of resource prestige is based on
         baseAmount() {return player.points}, // Get the current amount of baseResource
         type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
         exponent: 0.5, // Prestige currency exponent
