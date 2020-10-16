@@ -5,8 +5,8 @@ var gameEnded = false;
 
 
 let modInfo = {
-	name: "The Modding Tree",
-	id: "modbase",
+	name: "The Basic Tree",
+	id: "gapples2",
 	pointsName: "points",
 	discordName: "",
 	discordLink: "",
