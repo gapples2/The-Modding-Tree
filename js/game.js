@@ -7,7 +7,7 @@ var gameEnded = false;
 let modInfo = {
 	name: "The Basic Tree",
 	id: "gapples2",
-	pointsName: "points",
+	pointsName: "dust",
 	discordName: "",
 	discordLink: "",
 	changelogLink: "https://github.com/Acamaeda/The-Modding-Tree/blob/master/changelog.md",
@@ -16,8 +16,8 @@ let modInfo = {
 
 // Set your version in num and name, but leave the tmt values so people know what version it is
 let VERSION = {
-	num: "2.0.2",
-	name: "Pinnacle of Achievement Mountain",
+	num: "1.0.0",
+	name: "Basic Time",
 	tmtNum: "2.0.2",
 	tmtName: "Pinnacle of Achievement Mountain"
 }
