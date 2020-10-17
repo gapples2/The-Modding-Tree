@@ -109,7 +109,7 @@ addLayer("c", {
     effectDescription: "cheapening your Basic Upgrades.",
     color: "#938472",                       // The color for this layer, which affects many elements
     resource: "basic cheapeners",            // The name of this layer's main prestige resource
-    row: 0,                                 // The row this layer is on (0 is the first row)
+    row: 1,                                 // The row this layer is on (0 is the first row)
 
     baseResource: "points",                 // The name of the resource your prestige gain is based on
     baseAmount() {return player.points},    // A function to return the current value of that resource
