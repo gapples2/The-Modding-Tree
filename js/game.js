@@ -24,7 +24,7 @@ let VERSION = {
 
 // Determines if it should show points/sec
 function canGenPoints(){
-	return hasUpgrade("c", 11)
+	return true
 }
 
 // Calculate points/sec!
