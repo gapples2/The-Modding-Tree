@@ -16,15 +16,18 @@ let modInfo = {
 
 // Set your version in num and name, but leave the tmt values so people know what version it is
 let VERSION = {
-	num: "1.0.0",
-	name: "Basic Time",
+	pre: true,
+	num: "1.1.0",
+	name: "Cheapening Stuff",
 	tmtNum: "2.0.2",
 	tmtName: "Pinnacle of Achievement Mountain"
 }
 
 // Determines if it should show points/sec
 function canGenPoints(){
+	if (hasUpgrade("b",11)){
 	return true
+	} else {return false}
 }
 
 // Calculate points/sec!
@@ -32,8 +35,13 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
-	let gain = new Decimal(1)
-	if (hasUpgrade("b", 11)) gain = gain.times(upgradeEffect("b", 11))
+	let gain = new Decimal(0)
+	if (hasUpgrade("b", 11)) gain = gain.add(1)
+	if (hasUpgrade("b", 21)) gain = gain.add(1)
+	if (hasUpgrade("b", 31)) gain = gain.add(2)
+	if (hasUpgrade("b", 13)) gain = gain.mul(1.2)
+	if (hasUpgrade("b", 23)) gain = gain.mul(1.2)
+	if (hasUpgrade("b", 33)) gain = gain.mul(1.5)
 	return gain
 }
 
@@ -294,7 +302,7 @@ VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSI
 VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "")
 
 
-const ENDGAME = new Decimal("e280000000");
+const ENDGAME = new Decimal("e3");
 
 function gameLoop(diff) {
 	if (player.points.gte(ENDGAME) || gameEnded) gameEnded = 1
