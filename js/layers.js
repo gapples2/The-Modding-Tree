@@ -30,13 +30,27 @@ addLayer("b", {
         11: {
             title: "Add",
             description: "Gain 1 dust per second.",
-            cost: 1,
+            const: base11 = 1,
+            cost() {if (player["c"].points > 0) {
+               if(base11-(player["c"].points) > 0) {
+                   return base11-(player["c"].points)
+               }else{
+                   return 0}
+               }else{return base11}
+           },
             unlocked: true,
         },
         21: {
             title: "More Dust",
             description: "Gain ANOTHER 1 dust per second.",
-            cost: 1,
+            const: base21 = 1,
+            cost() {if (player["c"].points > 0) {
+               if(base21-(player["c"].points) > 0) {
+                   return base21-(player["c"].points)
+               }else{
+                   return 0}
+               }else{return base21}
+           },
             unlocked() {
                 return hasUpgrade("b", 11)
             }
@@ -45,50 +59,58 @@ addLayer("b", {
             title: "Double the Dust",
             description: "Gain 2 dust per second.",
             const: base31 = 2,
-            cost() {if (player["c"].points > 0 && Math.floor(base31/(player["c"].points+1)^2)>=1) {
-                return Math.floor(base31 / player["c"].points)
-            }else{
-                return base31
-            }},
+            cost() {if (player["c"].points > 0) {
+                if(base31-(player["c"].points) > 0) {
+                    return base31-(player["c"].points)
+                }else{
+                    return 0}
+                }else{return base31}
+            },
             unlocked() {
                 return hasUpgrade("b", 21)
             }
         },
-        13: {
+        12: {
             title: "Multiply",
-            description: "Gain 1.2x more dust per second.",
+            description: "Gain 1.5x more dust per second.",
             const: base13 = 4,
-            cost() {if (player["c"].points > 0 && Math.floor(base13/(player["c"].points+1)^2)>=1) {
-                return Math.floor(base13 / player["c"].points)
-            }else{
-                return base13
-            }},
+            cost() {if (player["c"].points > 0) {
+                if(base13-(player["c"].points) > 0) {
+                    return base13-(player["c"].points)
+                }else{
+                    return 0}
+                }else{return base13}
+            },
             unlocked() {
                 return hasUpgrade("b", 31)
             }
         },
-        23: {
+        22: {
             title: "More Multiplication",
-            description: "Gain a second bonus of 1.2x dust per second.",
-            const: base23 = 8,
-            cost() {if (player["c"].points > 0 && Math.floor(base23/(player["c"].points+1)^2)>=1) {
-                return Math.floor(base23 / player["c"].points)
-            }else{
-                return base23
-            }},
+            description: "Gain a second bonus of 1.5x dust per second.",
+            const: base23 = 7,
+            cost() {if (player["c"].points > 0) {
+                if(base23-(player["c"].points) > 0) {
+                    return base23-(player["c"].points)
+                }else{
+                    return 0}
+                }else{return base23}
+            },
             unlocked() {
                 return hasUpgrade("b", 13)
             }
         },
-        33: {
+        32: {
             title: "Multiplying Trend",
-            description: "A nice 1.5x multiplier to dust per second.",
-             const: base33 = 20,
-            cost() {if (player["c"].points > 0 && Math.floor(base33/(player["c"].points+1)^2)>=1) {
-                return Math.floor(base33 / player["c"].points)
-            }else{
-                return base33
-            }},
+            description: "A nice 2.0x multiplier to dust per second.",
+             const: base33 = 15,
+             cost() {if (player["c"].points > 0) {
+                if(base33-(player["c"].points) > 0) {
+                    return base33-(player["c"].points)
+                }else{
+                    return 0}
+                }else{return base33}
+            },
             unlocked() {
                 return hasUpgrade("b", 23)
             }
@@ -111,10 +133,11 @@ addLayer("c", {
     resource: "basic cheapeners",            // The name of this layer's main prestige resource
     row: 1,                                 // The row this layer is on (0 is the first row)
 
-    baseResource: "dust",                 // The name of the resource your prestige gain is based on
-    baseAmount() {return player.points},    // A function to return the current value of that resource
+    baseResource: "basic points",                 // The name of the resource your prestige gain is based on
+    baseAmount() {return player.b.points},    // A function to return the current value of that resource
 
-    requires: new Decimal(50),            // The amount of the base needed to  gain 1 of the prestige currency.
+    requires: new Decimal(5), 
+    base: 5,           // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
     canBuyMax(){return false},
     type: "static",                         // Determines the formula used for calculating prestige currency.
@@ -126,8 +149,10 @@ addLayer("c", {
     gainExp() {                             // Returns your exponent to your gain of the prestige resource
         return new Decimal(1)
     },
-
-    layerShown() {return true},             // Returns a bool for if this layer's node should be visible in the tree.
+    let: layerUnlocked = false,
+    layerShown() {
+        if (player["b"].points >= 5 || layerUnlocked === true) {layerUnlocked = true; return true}else{return false}
+    },             // Returns a bool for if this layer's node should be visible in the tree.
 },)
 addLayer("a", {
         startData() { return {

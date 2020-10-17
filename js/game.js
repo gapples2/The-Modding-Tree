@@ -17,7 +17,7 @@ let modInfo = {
 // Set your version in num and name, but leave the tmt values so people know what version it is
 let VERSION = {
 	pre: true,
-	num: "1.1.0.2",
+	num: "1.1.1 (cheapeners are changed)",
 	name: "Cheapening Stuff",
 	tmtNum: "2.0.2",
 	tmtName: "Pinnacle of Achievement Mountain"
@@ -39,9 +39,9 @@ function getPointGen() {
 	if (hasUpgrade("b", 11)) gain = gain.add(1)
 	if (hasUpgrade("b", 21)) gain = gain.add(1)
 	if (hasUpgrade("b", 31)) gain = gain.add(2)
-	if (hasUpgrade("b", 13)) gain = gain.mul(1.2)
-	if (hasUpgrade("b", 23)) gain = gain.mul(1.2)
-	if (hasUpgrade("b", 33)) gain = gain.mul(1.5)
+	if (hasUpgrade("b", 12)) gain = gain.mul(1.5)
+	if (hasUpgrade("b", 22)) gain = gain.mul(1.5)
+	if (hasUpgrade("b", 32)) gain = gain.mul(2.0)
 	return gain
 }
 
