@@ -111,7 +111,7 @@ addLayer("c", {
     resource: "basic cheapeners",            // The name of this layer's main prestige resource
     row: 1,                                 // The row this layer is on (0 is the first row)
 
-    baseResource: "points",                 // The name of the resource your prestige gain is based on
+    baseResource: "dust",                 // The name of the resource your prestige gain is based on
     baseAmount() {return player.points},    // A function to return the current value of that resource
 
     requires: new Decimal(50),            // The amount of the base needed to  gain 1 of the prestige currency.
