@@ -3,13 +3,21 @@ var tmp = {}
 // Tmp will not call these
 var activeFunctions = [
 	"startData", "onPrestige", "doReset", "update", "automate",
-	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress", "onClick", "masterButtonPress"
+	"buy", "buyMax", "respec", "onComplete", "onPurchase", "onPress", "onClick", "masterButtonPress",
+	"sellOne", "sellAll",
 ]
+
+var noCall = doNotCallTheseFunctionsEveryTick
+for (item in noCall) {
+	activeFunctions.push(noCall[item])
+}
 
 function setupTemp() {
 	tmp = {}
-	setupTempData(layers, tmp)
+	tmp.pointGen = {}
+	tmp.displayThings = []
 
+	setupTempData(layers, tmp)
 	for (layer in layers){
 		tmp[layer].resetGain = {}
 		tmp[layer].nextAt = {}
@@ -22,9 +30,6 @@ function setupTemp() {
 }
 
 function setupTempData(layerData, tmpData) {
-	tmp.pointGen = {}
-
-
 	for (item in layerData){
 		if (layerData[item] == null) {
 			tmpData[item] = null
@@ -64,6 +69,13 @@ function updateTemp() {
 	}
 
 	tmp.pointGen = getPointGen()
+	tmp.displayThings = []
+	for (thing in displayThings){
+		let text = displayThings[thing]
+		if (isFunction(text)) text = text()
+		tmp.displayThings.push(text) 
+	}
+
 }
 
 function updateTempData(layerData, tmpData) {
@@ -107,24 +119,27 @@ function constructBarStyles(layer){
 			let bar = tmp[layer].bars[id]
 			if (bar.progress instanceof Decimal)
 				bar.progress = bar.progress.toNumber()
-			bar.progress = Math.min(Math.max(bar.progress, 0), 1)
+			bar.progress = (1 -Math.min(Math.max(bar.progress, 0), 1)) * 100
 
 			bar.dims = {'width': bar.width + "px", 'height': bar.height + "px"}
 			let dir = bar.direction
-			bar.fillDims = {'width': bar.width + "px", 'height': bar.height + "px"}
+			bar.fillDims = {'width': (bar.width + 0.5) + "px", 'height': (bar.height + 0.5)  + "px"}
 			if (dir !== undefined)
 			{
-				bar.fillDims[DIR_MARGINS[dir]] = "0px"
-				if (dir == UP || dir == DOWN)
-				{
-					bar.fillDims.height = bar.height * bar.progress + "px"
-					if (dir == UP) bar.fillDims['margin-top'] =  bar.height * (1 - Math.min(bar.progress, 1)) + "px"
+				bar.fillDims['clip-path'] = 'inset(0% 50% 0% 0%)'
+				if(dir == UP){
+					bar.fillDims['clip-path'] = 'inset(' + bar.progress + '% 0% 0% 0%)'
 				}
-				else
-				{
-					bar.fillDims.width = bar.width * bar.progress + "px"
-					if (dir == LEFT) bar.fillDims['margin-left'] =  bar.width * (1 - Math.min(bar.progress, 1)) + "px"
+				else if(dir == DOWN){
+					bar.fillDims['clip-path'] = 'inset(0% 0% ' + bar.progress + '% 0%)'
 				}
+				else if(dir == RIGHT){
+					bar.fillDims['clip-path'] = 'inset(0% ' + bar.progress + '% 0% 0%)'
+				}
+				else if(dir == LEFT){
+					bar.fillDims['clip-path'] = 'inset(0% 0% 0% ' + bar.progress + '%)'
+				}
+
 			}
 		}
 

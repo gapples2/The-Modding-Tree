@@ -1,5 +1,36 @@
 # The Modding Tree changelog:
 
+## v2.1: We should have thought of this sooner! - 10/17/20
+- Moved most of the code users will want to edit to mod.js, added documentation for it.
+    - Specifically, modInfo, VERSION, canGenPoints, getPointGen, and maxTickLength
+- Added getStartPoints()
+- Added the ability to store non-layer-related data
+- Added the ability to display more things at the top of the tree tab below points.
+- Made the endgame condition customizable
+- Added "sell one" and "sell all" buttons for buyables.
+- Moved the old "game" to demo.js, and replaced it with a minimal game that won't cause issues when edited.
+- Fixed issues with version number
+- Fixed number formatting issue making things like "10e9" appear.
+
+
+### v2.0.5 - 10/16/20
+- Made more features (including prestige parameters) able to be dynamic.
+- Layer nodes can be hidden but still take up space with "ghost" visibility
+- Added clickableEffect for real.
+- Fixed some visual issues with bars.
+- A few other minor tweaks and improvements.
+
+### v2.0.4 - 10/16/20
+- Fixed HTML on buttons interfering with clicking on them.
+
+### v2.0.3 - 10/16/20
+- Fixed hotkeys not displaying in info.
+- Fixed the game supressing all external hotkeys.
+- You can use more things as currencies for upgrade costs and challenge goals using currencyLocation.
+- Added maxTickLength, which can be used to prevent offline time or tab-switching from breaking time-limit based mechanics.
+- Made buyable respec buttons and clickable "master" buttons their own components, and gave them a hide/show feature.
+- Added a general "tooltip" feature for achievements.
+
 ### v2.0.2 - 10/15/20
 - Branches are now dynamic (they can be functions).
 - Fixed a crash related to offline time.
