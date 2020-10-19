@@ -11,8 +11,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.2.0",
-	name: "cheapener update",
+	num: "1.3.0",
+	name: "the feedback update",
 	pre: true,
 }
 
@@ -38,19 +38,18 @@ function getPointGen() {
 	let gain = new Decimal(0)
 	let mult = new Decimal(1)
 	if (hasUpgrade("b", 11)) gain = gain.add(1)
-	if (hasUpgrade("b", 21)) gain = gain.add(1)
+	if (hasUpgrade("b", 21)) gain = gain.add(player["b"].points.pow(0.45).add(1))
 	if (hasUpgrade("b", 31)) gain = gain.add(2)
-	if (hasMilestone("c",1)) {mult = mult*2}
+	if (hasMilestone("c",2)) {mult = mult*2}
 	if (hasUpgrade("b", 12)) gain = gain.mul(1.5*mult)
-	if (hasUpgrade("b", 22)) gain = gain.mul(1.5*mult)
+	if (hasUpgrade("b", 22)) gain = gain.mul(player.points.pow(0.18).add(1).mul(mult))
 	if (hasUpgrade("b", 32)) gain = gain.mul(2.0*mult)
-	if (hasUpgrade("b", 33)) gain = gain.pow(1.15);else{
+	if (hasUpgrade("b", 33)) gain = gain.pow(player.c.points.div(100).mul(2).add(1.05));else{
 		if (hasUpgrade("b", 23)) gain = gain.pow(1.1);else{
 			if (hasUpgrade("b", 13)) gain = gain.pow(1.05);
 		}
 	}
-	if (hasMilestone("c",0)) gain = gain.mul(2.0)
-	if (hasMilestone("d",0)) gain = gain.mul(1000000000000000)
+	if (hasMilestone("c",1)) gain = gain.mul(2.0)
 	return gain
 }
 

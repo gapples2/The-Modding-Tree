@@ -35,20 +35,21 @@ addLayer("b", {
                if(base11-(player["c"].points) > 0) {
                    return base11-(player["c"].points)
                }else{
-                   return 0}
+                   return 1}
                }else{return base11}
            },
             unlocked: true,
         },
         21: {
             title: "More Dust",
-            description: "Gain ANOTHER 1 dust per second.",
+            description() {return `Gain more dust per second, based on your basic points.`},
+            effect(){return player["b"].points.pow(0.45).add(1)},
             const: base21 = 1,
             cost() {if (player["c"].points > 0) {
                if(base21-(player["c"].points) > 0) {
                    return base21-(player["c"].points)
                }else{
-                   return 0}
+                   return 1}
                }else{return base21}
            },
             unlocked() {
@@ -63,7 +64,7 @@ addLayer("b", {
                 if(base31-(player["c"].points) > 0) {
                     return base31-(player["c"].points)
                 }else{
-                    return 0}
+                    return 1}
                 }else{return base31}
             },
             unlocked() {
@@ -78,7 +79,7 @@ addLayer("b", {
                 if(base12-(player["c"].points) > 0) {
                     return base12-(player["c"].points)
                 }else{
-                    return 0}
+                    return 1}
                 }else{return base12}
             },
             unlocked() {
@@ -87,13 +88,14 @@ addLayer("b", {
         },
         22: {
             title: "More Multiplication",
-            description: "Gain a second bonus of 1.5x dust per second.",
+            description(){return `Gain a multiplier to your dust based on your dust.`},
+            effect(){return player.points.pow(0.18).add(1)},
             const: base22 = 7,
             cost() {if (player["c"].points > 0) {
                 if(base22-(player["c"].points) > 0) {
                     return base22-(player["c"].points)
                 }else{
-                    return 0}
+                    return 1}
                 }else{return base22}
             },
             unlocked() {
@@ -108,7 +110,7 @@ addLayer("b", {
                 if(base32-(player["c"].points) > 0) {
                     return base32-(player["c"].points)
                 }else{
-                    return 0}
+                    return 1}
                 }else{return base32}
             },
             unlocked() {
@@ -123,22 +125,22 @@ addLayer("b", {
                 if(base13-(player["c"].points) > 0) {
                     return base13-(player["c"].points)
                 }else{
-                    return 0}
+                    return 1}
                 }else{return base13}
             },
             unlocked() {
-                return hasMilestone("c",2)
+                return hasMilestone("c",3)
             }
         },
         23: {
             title: "Better Exponent",
-            description: "Dust gain is now ^1.10.",
+            description: `Dust gain is now ^1.10.`,
             const: base23 = 35,
             cost() {if (player["c"].points > 0) {
                 if(base23-(player["c"].points) > 0) {
                     return base23-(player["c"].points)
                 }else{
-                    return 0}
+                    return 1}
                 }else{return base23}
             },
             unlocked() {
@@ -147,13 +149,14 @@ addLayer("b", {
         },
         33: {
             title: "Amazing Exponent",
-            description: "Dust gain is now an amazing ^1.15.",
+            description(){return `Dust gain has an even better exponent, based on your cheapeners.`},
+            effect(){return player.c.points.div(100).mul(2).add(1.05)},
             const: base33 = 50,
             cost() {if (player["c"].points > 0) {
                 if(base33-(player["c"].points) > 0) {
                     return base33-(player["c"].points)
                 }else{
-                    return 0}
+                    return 1}
                 }else{return base33}
             },
             unlocked() {
@@ -173,7 +176,7 @@ addLayer("c", {
         unlocked: true,                    // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
     }},
-    effectDescription: "cheapening your Basic Upgrades.",
+    effectDescription(){return `cheapening your Basic Upgrades by ${player.c.points} Basic Point(s).`},
     color: "#938472",                       // The color for this layer, which affects many elements
     resource: "basic cheapeners",            // The name of this layer's main prestige resource
     row: 1,                                 // The row this layer is on (0 is the first row)
@@ -195,50 +198,87 @@ addLayer("c", {
         return new Decimal(1)
     },
     layerShown() {
-       if(player.b.points>=5 || player.c.points>=1){return true}
+       if(player.b.points>=5 || player.c.points>=1 || player.d.points>=1){return true}
     },             // Returns a bool for if this layer's node should be visible in the tree.
     branches() {
         return ["b","c"]
     },
     milestones: {
         0: {
+            requirementDescription: "1 cheapener",
+            effectDescription: "Autobuy upgrades that cost 1 basic point!",
+            toggles() {
+                if (player.c.points>=1){
+                [[buyUpg("b",11),"auto"],[buyUpg("b",21),"auto"],[buyUpg("b",31),"auto"]]
+                }
+            },
+            done(){
+                if (player["c"].points >= 1) {return true}else{return false}
+            }
+        },
+        1: {
             requirementDescription: "2 cheapeners",
             effectDescription: "Double the points!",
             done(){
                 if (player["c"].points >= 2) {return true}else{return false}
             }
         },
-        1: {
+        2: {
             requirementDescription: "3 cheapeners",
             effectDescription: "Double the multiply path's effects!",
             done(){
                 if (player["c"].points >= 3) {return true}else{return false}
             },
-            unlocked() {
-                return hasMilestone("c",0)
-            },
-        },
-        2: {
-            requirementDescription: "4 cheapeners",
-            effectDescription: "Fine. Here's 3 more upgrades.",
-            done(){
-                if (player["c"].points >= 4) {return true}else{return false}
+            toggles() {
+                if (player.c.points>=3){
+                [[buyUpg("b",12),"auto"]]
+                }
             },
             unlocked() {
                 return hasMilestone("c",1)
             },
         },
         3: {
+            requirementDescription: "4 cheapeners",
+            effectDescription: "Fine. Here's 3 more upgrades.",
+            done(){
+                if (player["c"].points >= 4) {return true}else{return false}
+            },
+            unlocked() {
+                return hasMilestone("c",2)
+            },
+        },
+        4: {
             requirementDescription: "5 cheapeners",
             effectDescription: "Ugh. I'll take you to the darkness, I guess.",
             done(){
                 if (player["c"].points >= 5) {return true}else{return false}
             },
             unlocked() {
-                return hasMilestone("c",2)
+                return hasMilestone("c",3)
+            },
+        },
+        5: {
+            requirementDescription: "6 cheapeners",
+            effectDescription: "This does nothing. Don't get more cheapeners.",
+            done(){
+                if (player["c"].points >= 6) {return true}else{return false}
+            },
+            toggles() {
+                if (player.c.points>=6){
+                    [[buyUpg("b",22),"auto"]]
+                    }
+            },
+            unlocked() {
+                return hasMilestone("c",3)
             },
         },
     },
+    hotkeys: [
+        {key: "c", // What the hotkey button is. Use uppercase if it's combined with shift, or "ctrl+x" if ctrl is.
+        desc: "c: reset your basic points for a cheapener", // The description of the hotkey used in the How To Play
+        onPress(){if (player.c.unlocked) doReset("c")}}, // This function is called when the hotkey is pressed.
+    ],           
 },)
 addLayer("d", {
     startData() { return {                  // startData is a function that returns default data for a layer. 
@@ -275,7 +315,7 @@ addLayer("d", {
     milestones: {
         0: {
             requirementDescription: "1 darkness",
-            effectDescription: "To be continued... (Since you got to the current end game, here's an extra 1e20 boost to help you.)",
+            effectDescription: "To be continued...",
             done(){
                 if (player["d"].points >= 1) {return true}else{return false}
             },
@@ -299,7 +339,7 @@ addLayer("a", {
             return ("Achievements")
         },
         achievements: {
-            rows: 2,
+            rows: 3,
             cols: 3,
             11: {
                 name: "The beginning...",
@@ -336,6 +376,24 @@ addLayer("a", {
                 done() {return player.c.points.gte(10)},
                 goalTooltip: "Buy 10 cheapeners.", // Shows when achievement is not completed
                 doneTooltip: "Buy 10 cheapeners."
+            },
+            31: {
+                name: "Welcome to the darkness.",
+                done() {return player.d.points.gte(1)},
+                goalTooltip: "Buy 1 darkness.", // Shows when achievement is not completed
+                doneTooltip: "Buy 1 darkness."
+            },
+            32: {
+                name: "Useless.",
+                done() {return player.d.points.gte(2)},
+                goalTooltip: "Buy 2 darkness.", // Shows when achievement is not completed
+                doneTooltip: "Buy 2 darkness."
+            },
+            33: {
+                name: "Why would you do this....",
+                done() {return player.d.points.gte(3)},
+                goalTooltip: "Buy 3 darkness. WARNING: This may not be possible at the moment.", // Shows when achievement is not completed
+                doneTooltip: "Buy 3 darkness."
             },
         },
         midsection: [
