@@ -476,8 +476,8 @@ addLayer("a", {
             33: {
                 name: "The darkness wants to help.",
                 done() {return player.d.points.gte(3)},
-                goalTooltip: "Buy 3 darkness. Reward: A new layer.... WARNING: This may not be possible at the moment.", // Shows when achievement is not completed
-                doneTooltip: "Buy 3 darkness. Reward: A new layer...."
+                goalTooltip: "Buy 3 darkness. Reward: Another 2x to dust.", // Shows when achievement is not completed
+                doneTooltip: "Buy 3 darkness. Reward: Another 2x to dust."
             },
         },
         midsection: [

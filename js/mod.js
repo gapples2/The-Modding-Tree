@@ -11,7 +11,7 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.4.0.1",
+	num: "1.4.1",
 	name: "Exponental Boosting",
 	pre: true,
 }
@@ -52,6 +52,7 @@ function getPointGen() {
 	}
 	if (hasMilestone("c",1)) gain = gain.mul(2.0)
 	if (hasAchievement("a",31)) gain = gain.mul(2)
+	if (hasAchievement("a",33)) gain = gain.mul(2)
 	return gain
 }
 
