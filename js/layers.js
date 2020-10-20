@@ -342,7 +342,9 @@ addLayer("d", {
                 if(player["d"].points>=1){return true}
             },
             toggles(){
+                if (player.d.points >= 2){
                 [[buyUpg("b",11),"auto"],[buyUpg("b",21),"auto"],[buyUpg("b",31),"auto"],[[buyUpg("b",12),"auto"],[buyUpg("b",22),"auto"],[buyUpg("b",32),"auto"],[[buyUpg("b",13),"auto"],[buyUpg("b",23),"auto"],[buyUpg("b",33),"auto"]]]]
+                }
             }
         },
         2: {

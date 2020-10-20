@@ -11,7 +11,7 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.4.0",
+	num: "1.4.0.1",
 	name: "Exponental Boosting",
 	pre: true,
 }
