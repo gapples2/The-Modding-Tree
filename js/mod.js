@@ -11,8 +11,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.4.1",
-	name: "Exponental Boosting",
+	num: "1.5.0",
+	name: "This game is FUN",
 	pre: true,
 }
 
@@ -53,6 +53,9 @@ function getPointGen() {
 	if (hasMilestone("c",1)) gain = gain.mul(2.0)
 	if (hasAchievement("a",31)) gain = gain.mul(2)
 	if (hasAchievement("a",33)) gain = gain.mul(2)
+	expon = 1
+	if (hasUpgrade("f",11)) expon++
+	if (player.f.points>0) gain = gain.mul(player.f.points.add(1).log10().add(1).pow(expon))
 	return gain
 }
 
@@ -67,7 +70,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e10"))
+	return player.points.gte(new Decimal("e20"))
 }
 
 

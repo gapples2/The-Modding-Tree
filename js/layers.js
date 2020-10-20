@@ -357,6 +357,16 @@ addLayer("d", {
                 if(player["d"].points>=2){return true}
             },
         },
+        3: {
+            requirementDescription: "5 darkness",
+            effectDescription: "Darkness isn't going to get reset now! That'll be for later. For now, here's a row 0 layer. Unlocks a new layer called Funity.",
+            done(){
+                if (player["d"].points >= 5) {return true}else{return false}
+            },
+            unlocked(){
+                if(player["d"].points>=3){return true}
+            },
+        },
     },
     
 },)
@@ -409,6 +419,67 @@ addLayer("e", {
           player.b.points = player.b.points.add(getResetGain("b").mul(0.1).mul(diff))
       },
 },)
+addLayer("f", {
+    startData() { return {                  // startData is a function that returns default data for a layer. 
+        unlocked: true,                    // You can add more variables here to add them to your layer.
+        points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+    }},
+    effectDescription(){
+        let mul = 1
+
+        if (hasUpgrade("f",11)) mul++
+        return `giving a ${player.f.points.add(1).log10().add(1).mul(100).floor().div(100).pow(mul)}x boost to dust, and ${player.f.points.add(1).log10().floor()}% more funity per second.`
+    },
+    effect(){player.f.points.add(1).log10().add(1)},
+    color: "#00FF00",                       // The color for this layer, which affects many elements
+    resource: "funity",            // The name of this layer's main prestige resource
+    row: 0,                                 // The row this layer is on (0 is the first row)
+
+    baseResource: "dust",                 // The name of the resource your prestige gain is based on
+    baseAmount() {return player.points},    // A function to return the current value of that resource
+
+    requires: new Decimal("1e6"),       // The amount of the base needed to  gain 1 of the prestige currency.
+                                               // Also the amount required to unlock the layer.
+    canBuyMax(){return false},
+    type: "normal",                         // Determines the formula used for calculating prestige currency.
+    exponent: 0.5,                          // "normal" prestige gain is (currency^exponent)
+
+    gainMult() {                            // Returns your multiplier to your gain of the prestige resource
+        return new Decimal(1)               // Factor in any bonuses multiplying gain here
+    },
+    gainExp() {                             // Returns your exponent to your gain of the prestige resource
+        return new Decimal(1)
+    },
+    layerShown() {
+       if (hasAchievement("a",34)) return true; else{return false}
+    },             // Returns a bool for if this layer's node should be visible in the tree.
+    milestones: {
+        0: {
+            requirementDescription: "10 funity",
+            effectDescription: "Gain 10% of your current funity per second.",
+            done(){
+                if (player["f"].points >= 10) {return true}else{return false}
+            },
+            unlocked(){
+                if(player["f"].points>=0){return true}
+            },
+        },
+    },
+    update(diff) {
+        if (hasMilestone("f",0)) 
+          player.f.points = player.f.points.add(player.f.points.mul(new Decimal(0.1).add(player.f.points.add(1).log10().floor().div(100))).mul(diff))
+      },
+      upgrades: {
+        rows: 1,
+        cols: 1,
+        11: {
+            title: "Powerful Fun",
+            description: "The dust multiplier for funity is now ^2.",
+            cost: new Decimal("1e10"),
+            unlocked: true,
+        },
+      },
+},)
 addLayer("a", {
         startData() { return {
             unlocked: true,
@@ -423,8 +494,8 @@ addLayer("a", {
             return ("Achievements")
         },
         achievements: {
-            rows: 3,
-            cols: 3,
+            rows: 5,
+            cols: 4,
             11: {
                 name: "The beginning...",
                 done() {return [player.points.gte(1)]}, // This one is a freebie
@@ -442,6 +513,12 @@ addLayer("a", {
                 done() {return player.b.points.gte(10)},
                 goalTooltip: "Basic * 10.", // Shows when achievement is not completed
                 doneTooltip: "Basic * 10."
+            },
+            14: {
+                name: "WAY too basic.",
+                done() {return player.b.points.gte(1000)},
+                goalTooltip: "1,000 BP.", // Shows when achievement is not completed
+                doneTooltip: "1,000 BP."
             },
             21: {
                 name: "Cheap.",
@@ -461,6 +538,12 @@ addLayer("a", {
                 goalTooltip: "Buy 10 cheapeners.", // Shows when achievement is not completed
                 doneTooltip: "Buy 10 cheapeners."
             },
+            24: {
+                name: "Cheapener Life.",
+                done() {return player.c.points.gte(25)},
+                goalTooltip: "Buy 25 cheapeners.", // Shows when achievement is not completed
+                doneTooltip: "Buy 25 cheapeners."
+            },
             31: {
                 name: "Welcome to the darkness.",
                 done() {return player.d.points.gte(1)},
@@ -478,6 +561,60 @@ addLayer("a", {
                 done() {return player.d.points.gte(3)},
                 goalTooltip: "Buy 3 darkness. Reward: Another 2x to dust.", // Shows when achievement is not completed
                 doneTooltip: "Buy 3 darkness. Reward: Another 2x to dust."
+            },
+            34: {
+                name: "Deep in the darkness.",
+                done() {return player.d.points.gte(5)},
+                goalTooltip: "Get 5 darkness.", // Shows when achievement is not completed
+                doneTooltip: "Get 5 darkness."
+            },
+            41: {
+                name: "Exponental.",
+                done() {return player.e.points.gte(1)},
+                goalTooltip: "Own 1 exponent.", // Shows when achievement is not completed
+                doneTooltip: "Own 1 exponent."
+            },
+            42: {
+                name: "Exponent Up.",
+                done() {return player.e.points.gte(2)},
+                goalTooltip: "Own 2 exponent.", // Shows when achievement is not completed
+                doneTooltip: "Own 2 exponent."
+            },
+            43: {
+                name: "More Exponent.",
+                done() {return player.e.points.gte(3)},
+                goalTooltip: "Own 3 exponent.", // Shows when achievement is not completed
+                doneTooltip: "Own 3 exponent."
+            },
+            44: {
+                name: "Absurd Exponent.",
+                done() {return player.e.points.gte(5)},
+                goalTooltip: "Own 5 exponent.", // Shows when achievement is not completed
+                doneTooltip: "Own 5 exponent."
+            },
+            51: {
+                name: "Should be in Antimatter Dimensions.",
+                done() {return player.f.points.gte(1)},
+                goalTooltip: "Buy 1 funity.", // Shows when achievement is not completed
+                doneTooltip: "Buy 1 funity."
+            },
+            52: {
+                name: "This is multiplying!",
+                done() {return player.f.points.gte("1e10")},
+                goalTooltip: "Get 1e10 funity.", // Shows when achievement is not completed
+                doneTooltip: "Get 1e10 funity."
+            },
+            53: {
+                name: "Light speed multiplication.",
+                done() {return player.f.points.gte("1e50")},
+                goalTooltip: "Get 1e50 funity.", // Shows when achievement is not completed
+                doneTooltip: "Get 1e50 funity."
+            },
+            54: {
+                name: "Infinity is no longer a goal.",
+                done() {return player.f.points.gte("1.81e308")},
+                goalTooltip: "Get 1.81e308 funity.", // Shows when achievement is not completed
+                doneTooltip: "Get 1.81e308 funity."
             },
         },
         midsection: [
