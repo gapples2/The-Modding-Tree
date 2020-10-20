@@ -269,7 +269,7 @@ addLayer("c", {
         },
         5: {
             requirementDescription: "6 cheapeners",
-            effectDescription: "This does nothing. Don't get more cheapeners.",
+            effectDescription: "You want a boost? Here's a nice 1x boost to help you progress (not really).",
             done(){
                 if (player["c"].points >= 6) {return true}else{return false}
             },
@@ -301,7 +301,7 @@ addLayer("d", {
 
     baseResource: "basic cheapeners",                 // The name of the resource your prestige gain is based on
     baseAmount() {return player.c.points},    // A function to return the current value of that resource
-
+    roundUpCost(){return "d"},
     requires: new Decimal(5), 
     base: 1.5,           // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
@@ -383,8 +383,8 @@ addLayer("e", {
     baseResource: "basic points",                 // The name of the resource your prestige gain is based on
     baseAmount() {return player.b.points},    // A function to return the current value of that resource
 
-    requires: new Decimal(5000),
-    base: new Decimal(5000),        // The amount of the base needed to  gain 1 of the prestige currency.
+    requires: new Decimal(1000),
+    base: new Decimal(1000),        // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
     canBuyMax(){return false},
     type: "static",                         // Determines the formula used for calculating prestige currency.
