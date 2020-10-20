@@ -14,13 +14,22 @@ addLayer("b", {
                                             
     effectDescription: "",
     type: "normal",                         
-    exponent: 0.5,                          
+    exponent(){
+        let log = 2
+        return new Decimal(0.5).add(player.e.points.div(100).add(1).log(log))
+    },                          
 
-    gainMult() {                            
-        return new Decimal(1)               
+    gainExp() {       
+        let mult = new Decimal(1)
+
+        if (hasMilestone("d",1)) mult.mul(2)
+        return mult              
     },
-    gainExp() {                             
-        return new Decimal(1)
+    gainMult() {       
+        let mult = new Decimal(1)
+
+        if (hasMilestone("d",1)) return new Decimal(2)
+        return new Decimal(1)          
     },
 
     layerShown() {return true},  
@@ -183,8 +192,8 @@ addLayer("c", {
 
     baseResource: "basic points",                 // The name of the resource your prestige gain is based on
     baseAmount() {return player.b.points},    // A function to return the current value of that resource
-
-    requires: new Decimal(5), 
+    
+    requires(){if (hasMilestone("d",0)){return new Decimal(4)}else{return new Decimal(5)}}, 
     base: 5,           // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
     canBuyMax(){return false},
@@ -294,7 +303,7 @@ addLayer("d", {
     baseAmount() {return player.c.points},    // A function to return the current value of that resource
 
     requires: new Decimal(5), 
-    base: 5,           // The amount of the base needed to  gain 1 of the prestige currency.
+    base: 1.5,           // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
     canBuyMax(){return false},
     type: "static",                         // Determines the formula used for calculating prestige currency.
@@ -315,15 +324,88 @@ addLayer("d", {
     milestones: {
         0: {
             requirementDescription: "1 darkness",
-            effectDescription: "To be continued...",
+            effectDescription: "The cheapener's base is down by 1! Amazing!",
             done(){
                 if (player["d"].points >= 1) {return true}else{return false}
+            },
+            unlocked(){
+                if(player["d"].points>=0){return true}
+            },
+        },
+        1: {
+            requirementDescription: "2 darkness",
+            effectDescription: "This has been delayed for too long. A cool 2x multiplier to your basic points. Also, you get an autobuyer for ALL of the basic upgrades!",
+            done(){
+                if (player["d"].points >= 2) {return true}else{return false}
+            },
+            unlocked(){
+                if(player["d"].points>=1){return true}
+            },
+            toggles(){
+                [[buyUpg("b",11),"auto"],[buyUpg("b",21),"auto"],[buyUpg("b",31),"auto"],[[buyUpg("b",12),"auto"],[buyUpg("b",22),"auto"],[buyUpg("b",32),"auto"],[[buyUpg("b",13),"auto"],[buyUpg("b",23),"auto"],[buyUpg("b",33),"auto"]]]]
+            }
+        },
+        2: {
+            requirementDescription: "3 darkness",
+            effectDescription: "There's not enough exponents in this game. Unlocks a new layer called Exponent.",
+            done(){
+                if (player["d"].points >= 3) {return true}else{return false}
+            },
+            unlocked(){
+                if(player["d"].points>=2){return true}
+            },
+        },
+    },
+    
+},)
+addLayer("e", {
+    startData() { return {                  // startData is a function that returns default data for a layer. 
+        unlocked: true,                    // You can add more variables here to add them to your layer.
+        points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+    }},
+    effectDescription(){return `giving a ^${player.e.points.div(50).add(1).log2().add(1).mul(100).floor().div(100)} to upgrade effects, and an added ^${player.e.points.div(100).add(1).log2().mul(100).floor().div(100)} to the dust to basic point conversion.`},
+    color: "#948203",                       // The color for this layer, which affects many elements
+    resource: "exponent",            // The name of this layer's main prestige resource
+    row: 1,                                 // The row this layer is on (0 is the first row)
+
+    baseResource: "basic points",                 // The name of the resource your prestige gain is based on
+    baseAmount() {return player.b.points},    // A function to return the current value of that resource
+
+    requires: new Decimal(5000),
+    base: new Decimal(5000),        // The amount of the base needed to  gain 1 of the prestige currency.
+                                               // Also the amount required to unlock the layer.
+    canBuyMax(){return false},
+    type: "static",                         // Determines the formula used for calculating prestige currency.
+    exponent: 0.5,                          // "normal" prestige gain is (currency^exponent)
+
+    gainMult() {                            // Returns your multiplier to your gain of the prestige resource
+        return new Decimal(1)               // Factor in any bonuses multiplying gain here
+    },
+    gainExp() {                             // Returns your exponent to your gain of the prestige resource
+        return new Decimal(1)
+    },
+    layerShown() {
+       if (hasAchievement("a",33)) return true; else{return false}
+    },             // Returns a bool for if this layer's node should be visible in the tree.
+    branches() {
+        return [["b","e"],["d","e"]]
+    },
+    milestones: {
+        0: {
+            requirementDescription: "1 exponent",
+            effectDescription: "Gain 10% of your basic point gain per second.",
+            done(){
+                if (player["e"].points >= 1) {return true}else{return false}
             },
             unlocked(){
                 if(player["d"].points>=1){return true}
             },
         },
     },
+    update(diff) {
+        if (hasMilestone("d",0)) 
+          player.b.points = player.b.points.add(getResetGain("b").mul(0.1).mul(diff))
+      },
 },)
 addLayer("a", {
         startData() { return {
@@ -380,20 +462,20 @@ addLayer("a", {
             31: {
                 name: "Welcome to the darkness.",
                 done() {return player.d.points.gte(1)},
-                goalTooltip: "Buy 1 darkness.", // Shows when achievement is not completed
-                doneTooltip: "Buy 1 darkness."
+                goalTooltip: "Buy 1 darkness. Reward: 2x dust.", // Shows when achievement is not completed
+                doneTooltip: "Buy 1 darkness. Reward: 2x dust."
             },
             32: {
-                name: "Useless.",
+                name: "The darkness says hi.",
                 done() {return player.d.points.gte(2)},
                 goalTooltip: "Buy 2 darkness.", // Shows when achievement is not completed
                 doneTooltip: "Buy 2 darkness."
             },
             33: {
-                name: "Why would you do this....",
+                name: "The darkness wants to help.",
                 done() {return player.d.points.gte(3)},
-                goalTooltip: "Buy 3 darkness. WARNING: This may not be possible at the moment.", // Shows when achievement is not completed
-                doneTooltip: "Buy 3 darkness."
+                goalTooltip: "Buy 3 darkness. Reward: A new layer.... WARNING: This may not be possible at the moment.", // Shows when achievement is not completed
+                doneTooltip: "Buy 3 darkness. Reward: A new layer...."
             },
         },
         midsection: [
