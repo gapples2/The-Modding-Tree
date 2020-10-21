@@ -6,17 +6,26 @@ addLayer("b", {
     color: "#939192", 
     resource: "basic points",            
     row: 0,                                 
- /*   automate() {
+    automate() {
         if (player["c"].autoCoinUpgrade) {
-            for (let x = 10; x <= 60; x += 10) for (let y = 1; y <= 4; y++) {
+            for (let x = 10; x <= 30; x += 10){ for (let y = 1; y <= 3; y++) {
                 var z = x + y
-                if (!hasUpgrade("b", z) && canAffordUpgrade("b", z) && tmp.upgrades.c[z].unl && layers["b"].upgrades[z].cost().equals(1) && hasMilestone("c",0)) {
+                if (!hasUpgrade("b", z) && canAffordUpgrade("b", z) && layers["b"].upgrades[z].cost()===1 && hasMilestone("c",0) && layers["b"].upgrades[z].unlocked()===true) {
                     buyUpg("b", z)
                 }
             }
-        }
+        }}
     },
-*/
+    automate2() {
+        if (player["d"].autoCoinUpgrade) {
+            for (let x = 10; x <= 30; x += 10){ for (let y = 1; y <= 3; y++) {
+                var z = x + y
+                if (!hasUpgrade("b", z) && canAffordUpgrade("b", z) && hasMilestone("d",1) && layers["b"].upgrades[z].unlocked()===true) {
+                    buyUpg("b", z)
+                }
+            }
+        }}
+    },
     baseResource: "dust",                 
     baseAmount() {return player.points},    
 
@@ -57,7 +66,7 @@ addLayer("b", {
                    return 1}
                }else{return base11}
            },
-            unlocked: true,
+            unlocked(){return true},
         },
         21: {
             title: "More Dust",
@@ -108,7 +117,9 @@ addLayer("b", {
                 }else{return base12}
             },
             unlocked() {
-                return player["c"].points > 0
+                if(player["c"].points>0 && hasUpgrade("b",11)){
+                    return true
+                }else{return false}
             }
         },
         22: {
@@ -319,7 +330,8 @@ addLayer("c", {
 addLayer("d", {
     startData() { return {                  // startData is a function that returns default data for a layer. 
         unlocked: true,                    // You can add more variables here to add them to your layer.
-        points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+        points: new Decimal(0), 
+        autoCoinUpgrade: false,            // "points" is the internal name for the main resource of the layer.
     }},
     effectDescription: "",
     color: "#303030",                       // The color for this layer, which affects many elements
@@ -368,11 +380,9 @@ addLayer("d", {
             unlocked(){
                 if(player["d"].points>=1){return true}
             },
-            toggles(){
-                if (player.d.points >= 2){
-                [[buyUpg("b",11),"auto"],[buyUpg("b",21),"auto"],[buyUpg("b",31),"auto"],[[buyUpg("b",12),"auto"],[buyUpg("b",22),"auto"],[buyUpg("b",32),"auto"],[[buyUpg("b",13),"auto"],[buyUpg("b",23),"auto"],[buyUpg("b",33),"auto"]]]]
-                }
-            }
+            toggles: [
+                ["d","autoCoinUpgrade"]
+            ],
         },
         2: {
             requirementDescription: "3 darkness",

@@ -11,8 +11,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.6.1.5",
-	name: "Yet another bug fix....",
+	num: "1.6.2",
+	name: "Fixed major bug",
 	pre: true,
 }
 
