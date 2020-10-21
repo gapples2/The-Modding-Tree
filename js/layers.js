@@ -6,7 +6,17 @@ addLayer("b", {
     color: "#939192", 
     resource: "basic points",            
     row: 0,                                 
-
+ /*   automate() {
+        if (player["c"].autoCoinUpgrade) {
+            for (let x = 10; x <= 60; x += 10) for (let y = 1; y <= 4; y++) {
+                var z = x + y
+                if (!hasUpgrade("b", z) && canAffordUpgrade("b", z) && tmp.upgrades.c[z].unl && layers["b"].upgrades[z].cost().equals(1) && hasMilestone("c",0)) {
+                    buyUpg("b", z)
+                }
+            }
+        }
+    },
+*/
     baseResource: "dust",                 
     baseAmount() {return player.points},    
 
@@ -198,7 +208,8 @@ addLayer("b", {
 addLayer("c", {
     startData() { return {                  // startData is a function that returns default data for a layer. 
         unlocked: true,                    // You can add more variables here to add them to your layer.
-        points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+        points: new Decimal(0),
+        autoCoinUpgrade: false,             // "points" is the internal name for the main resource of the layer.
     }},
     effectDescription(){return `cheapening your Basic Upgrades by ${player.c.points} Basic Point(s).`},
     color: "#938472",                       // The color for this layer, which affects many elements
@@ -209,7 +220,7 @@ addLayer("c", {
     baseAmount() {return player.b.points},    // A function to return the current value of that resource
     
     requires(){if (hasMilestone("d",0)){return new Decimal(4)}else{return new Decimal(5)}}, 
-    base(){return new Decimal(5).add(player.c.points.log10().floor())},           // The amount of the base needed to  gain 1 of the prestige currency.
+    base(){return new Decimal(5).add(player.c.points.add(1).log10().floor())},           // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
     canBuyMax(){
         if(hasMilestone("d",4)){return true}else{return false}
@@ -233,11 +244,10 @@ addLayer("c", {
         0: {
             requirementDescription: "1 cheapener",
             effectDescription: "Autobuy upgrades that cost 1 basic point!",
-            toggles() {
-                if (player.c.points>=1){
-                [[buyUpg("b",11),"auto"],[buyUpg("b",21),"auto"],[buyUpg("b",31),"auto"]]
-                }
-            },
+            if(){},
+            toggles: [
+                ["c","autoCoinUpgrade"]
+            ],
             done(){
                 if (player["c"].points >= 1) {return true}else{return false}
             }
