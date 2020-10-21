@@ -171,7 +171,10 @@ addLayer("b", {
         33: {
             title: "Amazing Exponent",
             description(){return `Dust gain has an even better exponent, based on your cheapeners.`},
-            effect(){return player.c.points.div(500).add(1).log2().add(1.1)},
+            effect(){
+                let expon = player.e.points.div(100).add(1).log2().add(1)
+                return player.c.points.div(500).add(1).pow(expon).log2().add(1.1)
+            },
             const: base33 = 50,
             cost() {if (player["c"].points > 0) {
                 if(base33-(player["c"].points) > 0) {
