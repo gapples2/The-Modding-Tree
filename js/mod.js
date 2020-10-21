@@ -11,8 +11,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.5.1",
-	name: "This game is FUN",
+	num: "1.6.0",
+	name: "trying to stop inflation",
 	pre: true,
 }
 
@@ -35,17 +35,21 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0)
 
+	let expon = player.e.points.div(100).add(1).log2().add(1)
 	let gain = new Decimal(0)
+	let gain2 = new Decimal(player["b"].points.pow(0.45).add(1).pow(expon))
+	if(gain2>=1000000){gain2=new Decimal("1e6").mul(gain2.log(1.5))}
 	let mult = new Decimal(1)
-	let expon = player.e.points.div(50).add(1).log2().add(1)
 	if (hasUpgrade("b", 11)) gain = gain.add(1)
-	if (hasUpgrade("b", 21)) gain = gain.add(player["b"].points.pow(0.45).add(1).pow(expon))
+	if (hasUpgrade("b", 21)) gain = gain.add(gain2)
 	if (hasUpgrade("b", 31)) gain = gain.add(2)
 	if (hasMilestone("c",2)) {mult = mult*2}
 	if (hasUpgrade("b", 12)) gain = gain.mul(1.5*mult)
-	if (hasUpgrade("b", 22)) gain = gain.mul(player.points.pow(0.18).add(1).mul(mult).pow(expon))
+	gain2 = new Decimal(player["b"].points.pow(0.18).add(1).pow(expon))
+	if(gain2>=1000000){gain2=new Decimal("1e6").mul(gain2.log(1.5))}
+	if (hasUpgrade("b", 22)) gain = gain.mul(gain2)
 	if (hasUpgrade("b", 32)) gain = gain.mul(2.0*mult)
-	if (hasUpgrade("b", 33)) gain = gain.pow(player.c.points.div(100).mul(2).add(1.05).pow(expon));else{
+	if (hasUpgrade("b", 33)) gain = gain.pow(player.c.points.div(500).add(1.15).pow(expon).log(2));else{
 		if (hasUpgrade("b", 23)) gain = gain.pow(1.1);else{
 			if (hasUpgrade("b", 13)) gain = gain.pow(1.05);
 		}

@@ -16,7 +16,7 @@ addLayer("b", {
     type: "normal",                         
     exponent(){
         let log = 2
-        return new Decimal(0.5).add(player.e.points.div(100).add(1).log(log))
+        return new Decimal(0.5).add(player.e.points.div(200).add(1).log(log))
     },                          
 
     gainExp() {       
@@ -52,7 +52,13 @@ addLayer("b", {
         21: {
             title: "More Dust",
             description() {return `Gain more dust per second, based on your basic points.`},
-            effect(){return player["b"].points.pow(0.45).add(1)},
+            effect(){
+                let pow = 1
+                if(player.e.points>0){pow=player.e.points.div(100).add(1).log2().add(1)}
+                let effect = player["b"].points.pow(0.45).add(1).pow(pow)
+                if(effect>1000000){effect=new Decimal("1e6").mul(effect.log(1.5))}
+                return effect
+            },
             const: base21 = 1,
             cost() {if (player["c"].points > 0) {
                if(base21-(player["c"].points) > 0) {
@@ -98,7 +104,13 @@ addLayer("b", {
         22: {
             title: "More Multiplication",
             description(){return `Gain a multiplier to your dust based on your dust.`},
-            effect(){return player.points.pow(0.18).add(1)},
+            effect(){
+                let pow = 1
+                if(player.e.points>0){pow=player.e.points.div(100).add(1).log2().add(1)}
+                let effect = player["b"].points.pow(0.18).add(1).pow(pow)
+                if(effect>1000000){effect=new Decimal("1e6").mul(effect.log(1.5))}
+                return effect
+            },
             const: base22 = 7,
             cost() {if (player["c"].points > 0) {
                 if(base22-(player["c"].points) > 0) {
@@ -159,7 +171,7 @@ addLayer("b", {
         33: {
             title: "Amazing Exponent",
             description(){return `Dust gain has an even better exponent, based on your cheapeners.`},
-            effect(){return player.c.points.div(100).mul(2).add(1.05)},
+            effect(){return player.c.points.div(500).add(1.15).log2()},
             const: base33 = 50,
             cost() {if (player["c"].points > 0) {
                 if(base33-(player["c"].points) > 0) {
@@ -196,7 +208,9 @@ addLayer("c", {
     requires(){if (hasMilestone("d",0)){return new Decimal(4)}else{return new Decimal(5)}}, 
     base: 5,           // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
-    canBuyMax(){return false},
+    canBuyMax(){
+        if(hasMilestone("d",4)){return true}else{return false}
+    },
     type: "static",                         // Determines the formula used for calculating prestige currency.
     exponent: 0.5,                          // "normal" prestige gain is (currency^exponent)
 
@@ -367,6 +381,16 @@ addLayer("d", {
                 if(player["d"].points>=3){return true}
             },
         },
+        4: {
+            requirementDescription: "6 darkness",
+            effectDescription: "Ugh. Fine. You can now buy max cheapeners. Just don't ask for exponent, though....",
+            done(){
+                if (player["d"].points >= 6) {return true}else{return false}
+            },
+            unlocked(){
+                if(player["d"].points>=5){return true}
+            },
+        },
     },
     
 },)
@@ -375,7 +399,9 @@ addLayer("e", {
         unlocked: true,                    // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
     }},
-    effectDescription(){return `giving a ^${player.e.points.div(50).add(1).log2().add(1).mul(100).floor().div(100)} to upgrade effects, and an added ^${player.e.points.div(100).add(1).log2().mul(100).floor().div(100)} to the dust to basic point conversion.`},
+    effectDescription(){
+        return `giving a ^${player.e.points.div(100).add(1).log2().add(1).mul(100).floor().div(100)} to upgrade effects, and an added ^${player.e.points.div(200).add(1).log2().mul(100).floor().div(100)} to the dust to basic point conversion.`
+    },
     color: "#948203",                       // The color for this layer, which affects many elements
     resource: "exponent",            // The name of this layer's main prestige resource
     row: 1,                                 // The row this layer is on (0 is the first row)
@@ -410,12 +436,12 @@ addLayer("e", {
                 if (player["e"].points >= 1) {return true}else{return false}
             },
             unlocked(){
-                if(player["d"].points>=1){return true}
+                if(player["e"].points>=0){return true}
             },
         },
     },
     update(diff) {
-        if (hasMilestone("d",0)) 
+        if (hasMilestone("e",0)) 
           player.b.points = player.b.points.add(getResetGain("b").mul(0.1).mul(diff))
       },
 },)
