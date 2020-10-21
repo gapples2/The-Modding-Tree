@@ -206,7 +206,7 @@ addLayer("c", {
     baseAmount() {return player.b.points},    // A function to return the current value of that resource
     
     requires(){if (hasMilestone("d",0)){return new Decimal(4)}else{return new Decimal(5)}}, 
-    base: 5,           // The amount of the base needed to  gain 1 of the prestige currency.
+    base(){return new Decimal(5).add(player.c.points.log10().floor())},           // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
     canBuyMax(){
         if(hasMilestone("d",4)){return true}else{return false}
@@ -410,7 +410,10 @@ addLayer("e", {
     baseAmount() {return player.b.points},    // A function to return the current value of that resource
 
     requires: new Decimal(1000),
-    base: new Decimal(1000),        // The amount of the base needed to  gain 1 of the prestige currency.
+    base(){
+        if(player.e.points>=25){return new Decimal("1e20")}
+        return new Decimal(1000)
+    },        // The amount of the base needed to  gain 1 of the prestige currency.
                                                // Also the amount required to unlock the layer.
     canBuyMax(){return false},
     type: "static",                         // Determines the formula used for calculating prestige currency.

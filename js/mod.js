@@ -11,8 +11,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.6.0",
-	name: "trying to stop inflation",
+	num: "1.6.1",
+	name: "stopped inflation",
 	pre: true,
 }
 
