@@ -11,8 +11,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.6.1.3",
-	name: "Bug Fix 4",
+	num: "1.6.1.4",
+	name: "Yet another bug fix....",
 	pre: true,
 }
 
@@ -49,7 +49,7 @@ function getPointGen() {
 	if(gain2>=1000000){gain2=new Decimal("1e6").mul(gain2.log(1.5))}
 	if (hasUpgrade("b", 22)) gain = gain.mul(gain2)
 	if (hasUpgrade("b", 32)) gain = gain.mul(2.0*mult)
-	if (hasUpgrade("b", 33)) gain = gain.pow(player.c.points.div(500).pow(expon).add(1).log(2).add(1.15));else{
+	if (hasUpgrade("b", 33)) gain = gain.pow(player.c.points.div(500).pow(expon).add(1).log(2).add(1.1));else{
 		if (hasUpgrade("b", 23)) gain = gain.pow(1.1);else{
 			if (hasUpgrade("b", 13)) gain = gain.pow(1.05);
 		}
