@@ -1,5 +1,65 @@
 # The Modding Tree changelog:
 
+### v2.2.1 - 11/7/20
+- Added a small highlight to layers you can meaningfully prestige on.
+- Added passiveGeneration and autoPrestige features to standardize prestige automation. (The old ways still work, but the new ones work better with other things)
+- Improved milestones visually a bit.
+- "best" and "total" are now only displayed if present in startData.
+- Fixed issues with things not updating visually. (Thank you to to Jacorb!)
+- Side layers and button nodes can now be highlighted.
+- Updated docs on the new tree-related features.
+
+## v2.2: Uprooted - 11/7/20
+- You can now embed a layer inside of a subtab or microtab!
+- Added support for hiding or reformatting the tree tab 
+- Added non-layer button nodes
+- Added shouldNotify to subtab/microtab buttons. (You can make them highlighted)
+- Added commas to large exponents.
+- Upgrades now only show "currently" if they have an effectDisplay (so not for constant effects).
+- Achievements are part of the default tab format.
+- NaN is now handled more intelligently.
+- Renamed files, and moved less relevant ones to another folder.
+- The "hide completed challenges" setting now only hides challenges at max completions.
+- Thank you to thepaperpilot for fixing errors in docs and improving the infobox appearance!
+- Many other minor fixes.
+
+
+### v2.1.4 - 10/25/20
+- Added an infobox component. Thank you to thepaperpilot for this contribution!
+- Layer type is now optional, and defaults to "none".
+- Improved the look of bars and tab buttons.
+- Improved spacing between layer nodes (also thanks to thepaperpilot!)
+- Fixed the "blank" component breaking if only specifying the height.
+- Fixed some numbers not displaying with enough digits.
+- Made a few more things able to be functions.
+- A few other minor fixes.
+
+### v2.1.3.1 - 10/21/20
+- Fixed the update function.
+
+### v2.1.3 - 10/21/20
+- gainMult and gainExp are now optional.
+- Layer unlocking is now kept on reset.
+- Game should start up faster.
+- Layer updates now have a determined order and starts with earlier-rowed layers.
+- Automation now has a determined order and starts with later-rowed layers.
+- Fixed issues with resetting clickables and challenges.
+- Commas should no longer appear in the decimal places of a number.
+- Fixed potential issue in displaying the tree.
+
+### v2.1.2 - 10/19/20
+- Added buyUpgrade function (buyUpg still works though)
+- Added author name to modInfo.
+- Fix to crash caused when the name of a subtab or microtab is changed.
+- Fixes to outdated information in docs.
+- Improvements to Discord links.
+- Thank you to thepaperpilot for contributing to this update!
+
+### v2.1.1 - 10/17/20
+- Added resource-display component, which displays the base currency for the prestige layer, as well as the best
+    and/or total of this layer's prestige currency.
+- Fixed the value for the base currency not updating in resource-display.
+
 ## v2.1: We should have thought of this sooner! - 10/17/20
 - Moved most of the code users will want to edit to mod.js, added documentation for it.
     - Specifically, modInfo, VERSION, canGenPoints, getPointGen, and maxTickLength
@@ -128,7 +188,6 @@ which will break old things)
 - Fixed a big save issue. If you use a unique mod id, your save will never conflict with other mods.
 - Added a configurable offline time limit in modinfo at the top of index.html. (default 1 hour)
 - Added a few minor features, and updated the docs with new information.
-
 
 
 ### v1.1.1:

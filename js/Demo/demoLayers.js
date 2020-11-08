@@ -1,3 +1,6 @@
+var testTree = [["f", "c"],
+["g", "spook", "h"]]
+
 addLayer("c", {
         layer: "c", // This is assigned automatically, both to the layer and all upgrades, etc. Shown here so you know about it
         name: "Candies", // This is optional, only used in a few places, If absent it just uses the layer id.
@@ -40,6 +43,14 @@ addLayer("c", {
             eff = this.effect();
             eff.waffleBoost = eff.waffleBoost.times(buyableEffect(this.layer, 11).first)
             return "which are boosting waffles by "+format(eff.waffleBoost)+" and increasing the Ice Cream cap by "+format(eff.icecreamCap)
+        },
+        infoboxes:{
+            coolInfo: {
+                title: "Lore",
+                titleStyle: {'color': '#FE0000'},
+                body: "DEEP LORE!",
+                bodyStyle: {'background-color': "#0000EE"}
+            }
         },
         milestones: {
             0: {requirementDescription: "3 Lollipops",
@@ -186,7 +197,7 @@ addLayer("c", {
             },
         },
         doReset(resettingLayer){ // Triggers when this layer is being reset, along with the layer doing the resetting. Not triggered by lower layers resetting, but is by layers on the same row.
-            if(layers[resettingLayer].row > this.row) layerDataReset(this.layer, ["upgrades", "challenges"]) // This is actually the default behavior
+            if(layers[resettingLayer].row > this.row) layerDataReset(this.layer) // This is actually the default behavior
         },
         layerShown() {return true}, // Condition for when layer appears on the tree
         automate() {
@@ -230,7 +241,7 @@ addLayer("c", {
                 width: 300,
                 height: 30,
                 progress() {
-                    return (player.points.log(10).div(10)).toNumber()
+                    return (player.points.add(1).log(10).div(10)).toNumber()
                 },
                 display() {
                     return format(player.points) + " / 1e10 points"
@@ -277,9 +288,10 @@ addLayer("c", {
         tabFormat: {
             "main tab": {
                 buttonStyle() {return  {'color': 'orange'}},
+                shouldNotify: true,
                 content:
                     ["main-display",
-                    "prestige-button",
+                    "prestige-button", "resource-display",
                     ["blank", "5px"], // Height
                     ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
                     ["display-text",
@@ -305,6 +317,7 @@ addLayer("c", {
             },
             jail: {
                 content: [
+                    ["infobox", "coolInfo"],
                     ["bar", "longBoi"], "blank",
                     ["row", [
                         ["column", [
@@ -316,7 +329,7 @@ addLayer("c", {
                         ["blank", ['0', '50px']], ["bar", "flatBoi"]
                         ]],
                     ]],
-                    "blank", ["display-text", "It's jail because \"bars\"! So funny! Ha ha!"],
+                    "blank", ["display-text", "It's jail because \"bars\"! So funny! Ha ha!"],["tree", testTree], 
                 ],
             },
             illuminati: {
@@ -351,6 +364,8 @@ addLayer("c", {
         resetDescription: "Melt your points into ",
 })
 
+
+
 // This layer is mostly minimal but it uses a custom prestige type and a clickable
 addLayer("f", {
     startData() { return {
@@ -364,17 +379,12 @@ addLayer("f", {
     resource: "farm points", 
     baseResource: "candies", 
     baseAmount() {return player.points},
-    type: "custom", // A "Custom" type which is effectively static
+    type: "static",
     exponent: 0.5,
     base: 3,
     roundUpCost: true,
     canBuyMax() {return hasAchievement('a', 13)},
-    gainMult() {
-        return new Decimal(1)
-    },
-    gainExp() {
-        return new Decimal(1)
-    },
+
     row: 1,
     layerShown() {return true}, 
     branches: ["c"], // When this layer appears, a branch will appear from this layer to any layers here. Each entry can be a pair consisting of a layer id and a color.
@@ -387,7 +397,6 @@ addLayer("f", {
         "blank", ['display-image', 'https://images.beano.com/store/24ab3094eb95e5373bca1ccd6f330d4406db8d1f517fc4170b32e146f80d?auto=compress%2Cformat&dpr=1&w=390'],
         ["display-text", "Bork bork!"]
     ],
-
     // The following are only currently used for "custom" Prestige type:
     prestigeButtonText() { //Is secretly HTML
         if (!this.canBuyMax()) return "Hi! I'm a <u>weird dinosaur</u> and I'll give you a Farm Point in exchange for all of your candies and lollipops! (At least " + formatWhole(tmp[this.layer].nextAt) + " candies)"
@@ -464,7 +473,7 @@ addLayer("f", {
 }, 
 )
 
-// A side layer with achievements
+// A side layer with achievements, with no prestige
 addLayer("a", {
         startData() { return {
             unlocked: true,
@@ -472,7 +481,6 @@ addLayer("a", {
         }},
         color: "yellow",
         resource: "achievement power", 
-        type: "none",
         row: "side",
         layerShown() {return true}, 
         tooltip() { // Optional, tooltip displays when the layer is locked
@@ -500,22 +508,5 @@ addLayer("a", {
                 onComplete() {console.log("Bork bork bork!")}
             },
         },
-        midsection: [
-            "achievements",
-        ]
     }, 
 )
-
-
-// A "ghost" layer which offsets f in the tree
-addLayer("spook", {
-    startData() { return {
-        unlocked: true,
-        points: new Decimal(0),
-    }},
-    type: "none",
-    row: 1,
-    layerShown: "ghost",
-}, 
-)
-

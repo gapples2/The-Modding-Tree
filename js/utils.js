@@ -7,13 +7,21 @@ function exponentialFormat(num, precision) {
 		m = new Decimal(1)
 		e = e.add(1)
 	}
-	return m.toStringWithDecimalPlaces(precision)+"e"+e.toStringWithDecimalPlaces(0)
+	e = (e.gte(10000) ? commaFormat(e, 0) : e.toStringWithDecimalPlaces(0))
+	return m.toStringWithDecimalPlaces(precision)+"e"+e
 }
 
 function commaFormat(num, precision) {
 	if (num === null || num === undefined) return "NaN"
 	if (num.mag < 0.001) return (0).toFixed(precision)
 	return num.toStringWithDecimalPlaces(precision).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
+
+function regularFormat(num, precision) {
+	if (num === null || num === undefined) return "NaN"
+	if (num.mag < 0.001) return (0).toFixed(precision)
+	return num.toStringWithDecimalPlaces(precision)
 }
 
 function fixValue(x, y = 0) {
@@ -41,17 +49,22 @@ function format(decimal, precision=2) {
 	} else if (decimal.gte("1e1000")) return exponentialFormat(decimal, 0)
 	else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
 	else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
-	else return commaFormat(decimal, precision)
+	else return regularFormat(decimal, precision)
 }
 
 function formatWhole(decimal) {
+	decimal = new Decimal(decimal)
+	if (decimal.gte(1e9)) return format(decimal, 2)
+	if (decimal.lte(0.95) && !decimal.eq(0)) return format(decimal, 2)
 	return format(decimal, 0)
 }
 
 function formatTime(s) {
 	if (s<60) return format(s)+"s"
 	else if (s<3600) return formatWhole(Math.floor(s/60))+"m "+format(s%60)+"s"
-	else return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
+	else if (s<86400) return formatWhole(Math.floor(s/3600))+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
+	else if (s<31536000) return formatWhole(Math.floor(s/84600)%365)+"d " + formatWhole(Math.floor(s/3600)%24)+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
+	else return formatWhole(Math.floor(s/31536000))+"y "+formatWhole(Math.floor(s/84600)%365)+"d " + formatWhole(Math.floor(s/3600)%24)+"h "+formatWhole(Math.floor(s/60)%60)+"m "+format(s%60)+"s"
 }
 
 function toPlaces(x, precision, maxAccepted) {
@@ -70,7 +83,8 @@ function save() {
 
 function startPlayerBase() {
 	return {
-		tab: "tree",
+		tab: layoutInfo.startTab,
+		navTab: (layoutInfo.showTree ? "tree-tab" : "none"),
 		time: Date.now(),
 		autosave: true,
 		notify: {},
@@ -83,8 +97,10 @@ function startPlayerBase() {
 		keepGoing: false,
 		hasNaN: false,
 		hideChallenges: false,
+		showStory: true,
 		points: modInfo.initialStartPoints,
 		subtabs: {},
+		lastSafeTab: (layoutInfo.showTree ? "none" : "layoutInfo.startTab")
 	}
 }
 
@@ -96,8 +112,13 @@ function getStartPlayer() {
 		for (thing in extradata)
 			playerdata[thing] = extradata[thing]
 	}
+
+	playerdata.infoboxes = {}
 	for (layer in layers){
-		playerdata[layer] = layers[layer].startData()
+		playerdata[layer] = {}
+		if (layers[layer].startData) 
+			playerdata[layer] = layers[layer].startData()
+		else playerdata[layer].unlocked = true
 		playerdata[layer].buyables = getStartBuyables(layer)
 		if(playerdata[layer].clickables == undefined) playerdata[layer].clickables = getStartClickables(layer)
 		playerdata[layer].spentOnBuyables = new Decimal(0)
@@ -113,6 +134,11 @@ function getStartPlayer() {
 			if (playerdata.subtabs[layer] == undefined) playerdata.subtabs[layer] = {}
 			for (item in layers[layer].microtabs)
 			playerdata.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
+		}
+		if (layers[layer].infoboxes) {
+			if (playerdata.infoboxes[layer] == undefined) playerdata.infoboxes[layer] = {}
+			for (item in layers[layer].infoboxes)
+				playerdata.infoboxes[layer][item] = false
 		}
 	}
 	return playerdata
@@ -157,6 +183,15 @@ function fixSave() {
 	{
 		if (player[layer].best !== undefined) player[layer].best = new Decimal (player[layer].best)
 		if (player[layer].total !== undefined) player[layer].total = new Decimal (player[layer].total)
+
+		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
+		
+			if(!Object.keys(layers[layer].tabFormat).includes(player.subtabs[layer].mainTabs)) player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0]
+		}
+		if (layers[layer].microtabs) {
+			for (item in layers[layer].microtabs)
+				if(!Object.keys(layers[layer].microtabs[item]).includes(player.subtabs[layer][item])) player.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0]
+		}
 	}
 }
 
@@ -197,7 +232,6 @@ function load() {
 	else player = Object.assign(getStartPlayer(), JSON.parse(atob(get)))
 	fixSave()
 
-	player.tab = "tree"
 	if (player.offlineProd) {
 		if (player.offTime === undefined) player.offTime = { remain: 0 }
 		player.offTime.remain += (Date.now() - player.time) / 1000
@@ -206,11 +240,45 @@ function load() {
 	versionCheck();
 	changeTheme();
 	changeTreeQuality();
+	updateLayers()
+
 	setupTemp();
 	updateTemp();
 	updateTemp();
 	loadVue();
 }
+
+
+function fixNaNs() {
+	NaNcheck(player)
+}
+
+function NaNcheck(data) {
+	for (item in data){
+		if (data[item] == null) {
+		}
+		else if (Array.isArray(data[item])) {
+			NaNcheck(data[item])
+		}
+		else if (data[item] !== data[item] || data[item] === decimalNaN){
+			if (NaNalert === true || confirm ("Invalid value found in player, named '" + item + "'. Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")){
+				NaNalert = true
+				data[item] = (data[item] !== data[item] ? 0 : decimalZero)
+			}
+			else {
+				clearInterval(interval);
+				player.autosave = false;
+				NaNalert = true;
+			}
+		}
+		else if (data[item] instanceof Decimal) { // Convert to Decimal
+		}
+		else if ((!!data[item]) && (data[item].constructor === Object)) {
+			NaNcheck(data[item])
+		}
+	}	
+}
+
 
 function exportSave() {
 	let str = btoa(JSON.stringify(player))
@@ -387,6 +455,10 @@ function hasChallenge(layer, id){
 	return (player[layer].challenges[id])
 }
 
+function maxedChallenge(layer, id){
+	return (player[layer].challenges[id] >= tmp[layer].challenges[id].completionLimit)
+}
+
 function challengeCompletions(layer, id){
 	return (player[layer].challenges[id])
 }
@@ -412,7 +484,7 @@ function upgradeEffect(layer, id){
 }
 
 function challengeEffect(layer, id){
-	return (tmp[layer].challenges[id].effect)
+	return (tmp[layer].challenges[id].rewardEffect)
 }
 
 function buyableEffect(layer, id){
@@ -445,6 +517,10 @@ function canAffordPurchase(layer, thing, cost) {
 	else {
 		return !(player[layer].points.lt(cost))
 	}
+}
+
+function buyUpgrade(layer, id) {
+	buyUpg(layer, id)
 }
 
 function buyUpg(layer, id) {
@@ -510,12 +586,12 @@ function clickClickable(layer, id) {
 // Function to determine if the player is in a challenge
 function inChallenge(layer, id){
 	let challenge = player[layer].activeChallenge
-	if (challenge == null) return
+	if (!challenge) return false
 	id = toNumber(id)
 	if (challenge==id) return true
 
 	if (layers[layer].challenges[challenge].countsAs)
-		return tmp[layer].challenges[id].countsAs.includes(id)
+		return tmp[layer].challenges[challenge].countsAs.includes(id)
 }
 
 // ************ Misc ************
@@ -524,15 +600,41 @@ var onTreeTab = true
 function showTab(name) {
 	if (LAYERS.includes(name) && !layerunlocked(name)) return
 
-	var toTreeTab = name == "tree"
+	var toTreeTab = name == "none"
 	player.tab = name
-	
-	if (toTreeTab != onTreeTab) {
-		document.getElementById("treeTab").className = toTreeTab ? "fullWidth" : "col left"
-		onTreeTab = toTreeTab
-		resizeCanvas()
-	}
+	if (player.navTab == "none" && (tmp[name].row !== "side") && (tmp[name].row !== "otherside")) player.lastSafeTab = name
 	delete player.notify[name]
+	needCanvasUpdate = true
+}
+
+function showNavTab(name) {
+	if (LAYERS.includes(name) && !layerunlocked(name)) return
+
+	var toTreeTab = name == "tree"
+	player.navTab = name
+	player.notify[name] = false
+	needCanvasUpdate = true
+}
+
+
+function goBack() {
+	if (player.navTab !== "none") showTab("none")
+	else showTab(player.lastSafeTab)
+}
+
+function layOver(obj1, obj2) {
+	for (let x in obj2) {
+		if (obj2[x] instanceof Object) layOver(obj1[x], obj2[x]);
+		else obj1[x] = obj2[x];
+	}
+}
+
+function prestigeNotify(layer) {
+	if (layers[layer].prestigeNotify) return layers[layer].prestigeNotify()
+	else if (tmp[layer].autoPrestige || tmp[layer].passiveGeneration) return false
+	else if (tmp[layer].type == "static") return tmp[layer].canReset
+	else if (tmp[layer].type == "normal") return (tmp[layer].canReset && (tmp[layer].resetGain.gte(player[layer].points.div(10))))
+	else return false
 }
 
 function notifyLayer(name) {
@@ -540,23 +642,41 @@ function notifyLayer(name) {
 	player.notify[name] = 1
 }
 
+function subtabShouldNotify(layer, family, id){
+	let subtab = {}
+	if (family == "mainTabs") subtab = tmp[layer].tabFormat[id]
+	else subtab = tmp[layer].microtabs[family][id]
+	if (player.subtabs[layer][family] === id) return false
+	else if (subtab.embedLayer) return tmp[subtab.embedLayer].notify
+	else return subtab.shouldNotify
+}
+
+function subtabResetNotify(layer, family, id){
+	let subtab = {}
+	if (family == "mainTabs") subtab = tmp[layer].tabFormat[id]
+	else subtab = tmp[layer].microtabs[family][id]
+	if (subtab.embedLayer) return tmp[subtab.embedLayer].prestigeNotify
+	else return false
+}
+
 function nodeShown(layer) {
 	if (tmp[layer].layerShown) return true
 	switch(layer) {
 		case "idk":
-			return player.l.unlocked
+			return player.idk.unlocked
 			break;
 	}
 	return false
 }
 
 function layerunlocked(layer) {
+	if (tmp[layer] && tmp[layer].type == "none") return (player[layer].unlocked)
 	return LAYERS.includes(layer) && (player[layer].unlocked || (tmp[layer].baseAmount.gte(tmp[layer].requires) && tmp[layer].layerShown))
 }
 
 function keepGoing() {
 	player.keepGoing = true;
-	showTab("tree")
+	needCanvasUpdate = true;
 }
 
 function toNumber(x) {
@@ -637,10 +757,6 @@ function prestigeButtonText(layer)
 	else
 		return layers[layer].prestigeButtonText()
 }
-
-
-
-
 
 function isFunction(obj) {
 	return !!(obj && obj.constructor && obj.call && obj.apply);
