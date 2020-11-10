@@ -147,7 +147,7 @@ addLayer("m", {
         },
         31: {
             title: "Gogon's Sword",
-            description: "This thing can slice one part of the log() for the motivation effect like it's butter. (Hint: Get 350 Motivation after you buy this.)",
+            description: "This thing can slice one part of the log() for the motivation effect like it's butter. (Get 350 motivation for the next upgrade after you buy this. Then get 5 hours of work done.)",
             cost: new Decimal(150),
         },
         32: {

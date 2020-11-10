@@ -16,10 +16,14 @@ addLayer("u", {
     resetDescription: "Release new build for ",
     startData() { return {
         unlocked: true,
+        gotten: false,
         best: new Decimal(0),
         points: new Decimal(0),
     }},
-    layerShown(){return hasUpgrade("m", 32)},
+    layerShown(){if(hasUpgrade("m",32)||player.u.gotten===true){
+        player.u.gotten=true
+        return true
+    }else{return false}},
     type: "static",
     requires: new Decimal(5),
     base: new Decimal(5),
@@ -85,7 +89,7 @@ addLayer("u", {
             description: "Increase your productivity by a massive 50% by opening the floodgates to countless open source developers",
             cost: new Decimal(1),
             unlocked() {
-                 if(hasUpgrade("m",12)||player["u"].points.gte(1))return true 
+                 if(player.u.gotten===true)return true 
                 }
         },
         21: {
@@ -102,7 +106,7 @@ addLayer("u", {
             description: "Increase productivity by how many current updates have been released",
             cost: new Decimal(3),
             effect() { return player.u.points.add(1) },
-            unlocked() { return hasUpgrade("u", 12) }
+            unlocked() { return hasUpgrade("u", 21) }
         },
         31: {
             title: "Cosmetics Economy",
