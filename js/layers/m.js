@@ -147,13 +147,13 @@ addLayer("m", {
         },
         31: {
             title: "Gogon's Sword",
-            description: "This thing can slice one part of the log() for the motivation effect like it's butter. (Hint: Get 20,000 Motivation after you buy this.)",
+            description: "This thing can slice one part of the log() for the motivation effect like it's butter. (Hint: Get 350 Motivation after you buy this.)",
             cost: new Decimal(150),
         },
         32: {
             title: "Release the update already!",
             description: "You need to release the update. You need this upgrade.",
-            cost: new Decimal(20000),
+            cost: new Decimal(350),
             unlocked(){if(hasUpgrade("m",32) || player.points.gte(5)){return true}else{return false}},
         },
     },
