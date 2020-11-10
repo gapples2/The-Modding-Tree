@@ -3,7 +3,7 @@ addLayer("e", {
     symbol: "E",
     color: experienceColor,
     branches: [ 'u' ],
-    row: 1,
+    row: 2,
     position: 0,
     resource: "experience",
     baseResource: "updates",

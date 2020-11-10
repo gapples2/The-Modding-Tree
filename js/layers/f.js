@@ -3,7 +3,7 @@ addLayer("f", {
     symbol: "F",
     color: fameColor,
     branches: [ 'c' ],
-    row: 2,
+    row: 3,
     position: 3,
     resource: "fame",
     baseResource: "cash",

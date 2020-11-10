@@ -3,7 +3,7 @@ addLayer("t", {
     symbol: "T",
     color: timeFluxColor,
     branches: [ 'r', 's' ],
-    row: 3,
+    row: 4,
     position: 2,
     resource: "time flux",
     baseResource: "refactors",

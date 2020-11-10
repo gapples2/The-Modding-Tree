@@ -3,7 +3,7 @@ addLayer("r", {
     symbol: "R",
     color: refactoringColor,
     branches: [ 'e' ],
-    row: 2,
+    row: 3,
     position: 1,
     resource: "refactors",
     baseResource: "experience",

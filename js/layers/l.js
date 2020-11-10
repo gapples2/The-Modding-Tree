@@ -3,7 +3,7 @@ addLayer("l", {
     symbol: "L",
     color: lecturesColor,
     branches: [ 's', 'f' ],
-    row: 3,
+    row: 4,
     position: 4,
     resource: "lectures",
     baseResource: "fame",

@@ -3,7 +3,7 @@ addLayer("s", {
     symbol: "S",
     color: schoolColor,
     branches: [ 'e', 'c' ],
-    row: 2,
+    row: 3,
     position: 2,
     resource: "enrollments",
     baseResource: "experience",

@@ -3,7 +3,7 @@ addLayer("c", {
     symbol: "C",
     color: cashColor,
     branches: [ 'u' ],
-    row: 1,
+    row: 2,
     position: 1,
     resource: "cash",
     baseResource: "updates",

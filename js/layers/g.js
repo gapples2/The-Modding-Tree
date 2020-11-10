@@ -3,7 +3,7 @@ addLayer("g", {
     symbol: "G",
     color: goodwillColor,
     branches: [ 'f' ],
-    row: 3,
+    row: 4,
     position: 5,
     resource: "good will",
     baseResource: "fame",

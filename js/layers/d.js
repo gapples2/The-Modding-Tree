@@ -3,7 +3,7 @@ addLayer("d", {
     symbol: "D",
     color: diplomaColor,
     branches: [ 'r', 's', 'f' ],
-    row: 3,
+    row: 4,
     position: 3,
     resource: "diplomas",
     baseResource: "enrollments",

@@ -1,9 +1,9 @@
 let modInfo = {
-	name: "The Game Dev Tree",
+	name: "The Bad Game Developer Tree",
 	id: "gamedevtree",
-	author: "thepaperpilot",
+	author: "gapples2 (original by thepaperpilot)",
 	pointsName: "hours of work",
-	endgame: new Decimal("e50"),
+	endgame: new Decimal("5e0"),
 	discordName: "The Paper Pilot Community Server",
 	discordLink: "https://discord.gg/WzejVAx",
 	changelogLink: "https://github.com/thepaperpilot/The-Modding-Tree/blob/gamedevtree/changelog.md",
@@ -13,8 +13,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "1.0.3",
-	name: "Version Bump [rebalanced,debuggedx2]",
+	num: "0.0.1",
+	name: "the new mod",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -67,7 +67,12 @@ function getPointGen() {
 		gain = gain.divide(slowDownModifier.pow(.0625))
 		gain = gain.divide(slowDownModifier.pow(.03125))
 	}
-
+	gain = gain.div(5000)
+	if (gain<0)gain=0
+	if (gain>=1)gain=gain.log(2).add(1)
+	gain = gain.mul(layers.m.effect())
+	if (hasUpgrade("m",11))gain=gain.mul(1.5)
+	if (player.points.gte(10))gain=gain.minus(gain)
 	return gain
 }
 
@@ -79,12 +84,14 @@ function addedPlayerData() { return {
 // Display extra things at the top of the page
 var displayThings = [
 	"<br/>",
-	() => player.points < 24 * 3 ? "<br/>" :
-		  player.points < 24 * 365 * 3 ?          `equivalent to ${format(player.points.div(24))} days of work` :
-		  player.points < 24 * 365 * 300 ?        `equivalent to ${format(player.points.div(24 * 365))} years of work` :
-		  player.points < 24 * 365 * 3000000 ?    `equivalent to ${format(player.points.div(24 * 365 * 100))} centuries of work` :
-		  player.points < 24 * 365 * 3000000000 ? `equivalent to ${format(player.points.div(24 * 365 * 1000000))} epochs of work` :
-		  new Decimal(24 * 365).times("3e1000").gte(player.points) ? `equivalent to ${format(player.points.div(24 * 365 * 1000000000))} eons of work` :
+	() =>		  player.points < 60/60/60 ?          `equivalent to ${format(player.points.mul(60*60))} seconds of work` : 		  
+	player.points < 60/60 ?          `equivalent to ${player.points.mul(60).floor()} minutes and ${format(player.points.mul(3600).minus(player.points.mul(60).ceil().mul(60).minus(60)),2)} seconds of work` :
+		player.points < 24 * 3 ? "<br/>" :
+		player.points < 24 * 365 * 3 ?          `equivalent to ${format(player.points.div(24))} days of work` :
+		player.points < 24 * 365 * 300 ?        `equivalent to ${format(player.points.div(24 * 365))} years of work` :
+		player.points < 24 * 365 * 3000000 ?    `equivalent to ${format(player.points.div(24 * 365 * 100))} centuries of work` :
+		player.points < 24 * 365 * 3000000000 ? `equivalent to ${format(player.points.div(24 * 365 * 1000000))} epochs of work` :
+		new Decimal(24 * 365).times("3e1000").gte(player.points) ? `equivalent to ${format(player.points.div(24 * 365 * 1000000000))} eons of work` :
 		                                          `equivalent to heat death ^${format(player.points.log(new Decimal(24).mul(365).mul("1e1000")))} of work`
 ]
 

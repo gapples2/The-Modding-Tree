@@ -2,14 +2,14 @@ addLayer("u", {
     name: "updates",
     symbol: "U",
     color: updatesColor,
-    row: 0,
+    row: 1,
     position: 0,
     resource: "updates",
     baseResource: "hours of work",
     infoboxes: {
         lore: {
             title: "updates",
-            body: "You've started working on this great little game idea you've had kicking around for awhile! Unfortunately, the longer you work on it the less your productivity seems to translate into hours of work :/<br/><br/>" +
+            body: "You're a game developer, let's just say that you're not good at it.<br/>You've started working on this great little game idea you've had kicking around for awhile! Unfortunately, the longer you work on it the less your productivity seems to translate into hours of work :/<br/><br/>" +
                   "Also, if you're familiar with other TPT mods, you should know this one works differently: layers are only reset along branches!"
         }
     },
@@ -19,7 +19,7 @@ addLayer("u", {
         best: new Decimal(0),
         points: new Decimal(0),
     }},
-    layerShown: true,
+    layerShown(){return hasUpgrade("m", 32)},
     type: "static",
     requires: new Decimal(5),
     base: new Decimal(5),
@@ -38,6 +38,7 @@ addLayer("u", {
         }
         mult = mult.pow(buyableEffect("a", 13))
         if (hasUpgrade("l", 13) && !inChallenge("d", 21)) mult = mult.pow(2)
+        mult = mult.pow(0.001)
         return mult
     },
     gainExp() {
@@ -76,13 +77,16 @@ addLayer("u", {
             cost: new Decimal(5),
             currencyDisplayName: "hours of work",
             currencyInternalName: "points",
-            currencyLocation: ""
+            currencyLocation: "",
+            unlocked() { return hasUpgrade("u", 12) }
         },
         12: {
             title: "Create a github repo",
             description: "Increase your productivity by a massive 50% by opening the floodgates to countless open source developers",
             cost: new Decimal(1),
-            unlocked() { return hasUpgrade("u", 11) }
+            unlocked() {
+                 if(hasUpgrade("m",12)||player["u"].points.gte(1))return true 
+                }
         },
         21: {
             title: "Bug fixes count as updates, right?",
