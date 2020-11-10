@@ -59,7 +59,7 @@ addLayer("m", {
     },
     gainExp() {
         let mult = new Decimal(1)                             // Returns your exponent to your gain of the prestige resource
-        if(hasUpgrade("m",22))mult=mult.mul(2)
+        if(hasUpgrade("m",22))mult=mult.mul(1.5)
         return mult
     },
     canBuyMax(){return true},
@@ -142,7 +142,7 @@ addLayer("m", {
         },
         22: {
             title: "Ultimate Motivation",
-            description: "This is the only motivation booster. Your motivation has insane power, but you can increase that by spending a bit more motivation. Squares motivation gain.",
+            description: "This is the only motivation booster. Your motivation has insane power, but you can increase that by spending a bit more motivation. Raises motivation gain to the power of 1.5.",
             cost: new Decimal(50),
         },
         31: {
