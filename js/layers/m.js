@@ -92,7 +92,7 @@ addLayer("m", {
             cost(){
                 let expon = new Decimal(1)
                 expon = expon.add(getBuyableAmount("m",12).add(1.5).div(2))
-                return getBuyableAmount("m",12).add(1).pow(expon).ceil()
+                return getBuyableAmount("m",12).add(1.5).pow(expon).ceil()
             },
             canAfford(){
                 if(player.m.points.gte(layers.m.buyables[12].cost())){return true}else{return false}
@@ -109,7 +109,7 @@ addLayer("m", {
             cost(){
                 let expon = new Decimal(1)
                 expon = expon.add(getBuyableAmount("m",13).add(1.5).div(1.5))
-                return getBuyableAmount("m",13).add(1).pow(expon).ceil()
+                return getBuyableAmount("m",13).add(2).pow(expon).ceil()
             },
             canAfford(){
                 if(player.m.points.gte(layers.m.buyables[13].cost())){return true}else{return false}
