@@ -6,7 +6,7 @@ addLayer("m", {
     infoboxes: {
         lore: {
             title: "motivation",
-            body: "You're barely getting any work done. You're getting tired of seeing barely any progress made in what feels like hours.<br/><br/>"+"You're about to give up when you realize you never had motivation. You see a few fans waiting for your game to release, and that motivates you to work more."
+            body: "you're barely getting any work doNe. yOu're getting tired of seeing bareLy any prOgress made in what feels like houRs.<br/><br/>"+"you'rE about to give up wHEn you realize you neveR had motivation. you sEe a few fans waiting for your game to release, and that motivates you to work more."
         }
     },
     tabFormat: [
