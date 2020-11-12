@@ -7,14 +7,14 @@ let modInfo = {
 	discordName: "The Paper Pilot Community Server",
 	discordLink: "https://discord.gg/WzejVAx",
 	changelogLink: "https://github.com/thepaperpilot/The-Modding-Tree/blob/gamedevtree/changelog.md",
-    offlineLimit: 5,  // In hours
+    offlineLimit: 0,  // In hours
     initialStartPoints: new Decimal (0) // Used for hard resets and new players
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0.1.3",
-	name: "dumb idea",
+	num: "0.0.1.4",
+	name: "you dont get offline time anymore",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
