@@ -423,7 +423,7 @@ addLayer("e", {
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
     }},
     effectDescription(){
-        return `giving a ^${player.e.points.div(100).add(1).log2().add(1).mul(100).floor().div(100)} to upgrade effects, and an added ^${player.e.points.div(200).add(1).log2().mul(100).floor().div(100)} to the dust to basic point conversion.`
+        return `giving a ^${format(player["e"].points.div(100).add(1).log2().add(1),3)} to upgrade effects, and an added ^${player.e.points.div(200).add(1).log2().mul(100).floor().div(100)} to the dust to basic point conversion.`
     },
     color: "#948203",                       // The color for this layer, which affects many elements
     resource: "exponent",            // The name of this layer's main prestige resource
@@ -475,12 +475,18 @@ addLayer("f", {
     startData() { return {                  // startData is a function that returns default data for a layer. 
         unlocked: true,                    // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+        wallOfText: false,
     }},
     effectDescription(){
         let mul = 1
+        let percent = player.f.points.add(1).log10()
+        let softcapped = ""
+
+        if(percent>=100){percent=new Decimal(100.00)
+             if(hasMilestone("f",1)&&player["f"].wallOfText){softcapped="{softcapped, but it's hardcapped. You may be wondering: how is this possible? Well, we're not sure. This is something science can't answer, and will stay like this forever. Don't ask anymore. Anyways, now that I'm done about that, I should really stop talking. Yeah, I'll stop talking now. It's a waste of space. Like, a very large waste of space. I'm leaving now. Bye.... Wait, I need permission? Why? Ugh, fine. I'll go grab permission. Walk, walk, walk. Finally! I'm here! Wait, what? I need 1 {upcoming layer} to pass? I can't even get one yet since it's not even out yet. Oh. OH. I see. Well, I can't really do to much now. Welp, I'm stuck. Maybe I'll just wait for the next update, which will release in- BREAKING NEWS: Why is there news? -. It's cool that someone knows the release date now. I'll just sit here and wait for the {unreleased update} to come out. Wait, wait, wait. More waiting. Even more waiting. There should be a tree called the Waiting Tree. Like, there's not enough trees in this world. All we have are 7 known active trees, and 3 inactive trees. It's boring. There should also be the Boring Tree. What should I do now?       reply on what should be next}"}else{softcapped="{hardcapped}"}}
 
         if (hasUpgrade("f",11)) mul++
-        return `giving a ${player.f.points.add(1).log10().add(1).mul(100).floor().div(100).pow(mul)}x boost to dust, and ${player.f.points.add(1).log10().floor()}% more funity per second.`
+        return `giving a ${format(player.f.points.add(1).log10().add(1).pow(mul),3)}x boost to dust, and ${format(percent,2)}% ${softcapped} more funity per second.`
     },
     effect(){player.f.points.add(1).log10().add(1)},
     color: "#00FF00",                       // The color for this layer, which affects many elements
@@ -516,10 +522,25 @@ addLayer("f", {
                 if(player["f"].points>=0){return true}
             },
         },
+        1: {
+            requirementDescription: "1e100 funity",
+            effectDescription: "Get the option to have a wall of text to {hardcapped}.",
+            done(){
+                if (player["f"].points.gte("1e100")) {return true}else{return false}
+            },
+            unlocked(){
+                if(player["f"].points>=10){return true}
+            },
+            toggles: [
+                ["f","wallOfText"]
+            ],
+        },
     },
     update(diff) {
+        let num = player.f.points.add(1).log10()
+        if(num>=100)num=100
         if (hasMilestone("f",0)) 
-          player.f.points = player.f.points.add(player.f.points.mul(new Decimal(0.1).add(player.f.points.add(1).log10().floor().div(100))).mul(diff))
+            player.f.points = player.f.points.add(player.f.points.mul(new Decimal(0.1).add(num)).pow(diff))
       },
       upgrades: {
         rows: 1,
@@ -530,8 +551,46 @@ addLayer("f", {
             cost: new Decimal("1e10"),
             unlocked: true,
         },
+        12: {
+            title: "Hardcapped Is Dumb",
+            description: "Hardcapped now starts 2x later.",
+            cost: new Decimal("1e2000"),
+            unlocked(){return hasUpgrade("f",12)},
+        },
       },
 },)
+addLayer("g", {
+    startData() { return {                  // startData is a function that returns default data for a layer. 
+        unlocked: true,                    // You can add more variables here to add them to your layer.
+        points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+    }},
+    effectDescription(){return `increasing the funity softcap by ${format(player["g"].points.add(1).mul(10).pow(10).mul(100).log(25),2)}%`},
+    color: "#00FF99",                       // The color for this layer, which affects many elements
+    resource: "games",            // The name of this layer's main prestige resource
+    row: 2,                                 // The row this layer is on (0 is the first row)
+
+    baseResource: "funity",                 // The name of the resource your prestige gain is based on
+    baseAmount() {return player["f"].points},    // A function to return the current value of that resource
+
+    requires: new Decimal("1e1000"),            // The amount of the base needed to  gain 1 of the prestige currency.
+                                            // Also the amount required to unlock the layer.
+    
+    type: "static",                         // Determines the formula used for calculating prestige currency.
+    exponent: 3,                          // "normal" prestige gain is (currency^exponent)
+    base: new Decimal("1e10"),
+    canBuyMax(){return true},
+    gainMult() {                            // Returns your multiplier to your gain of the prestige resource
+        return new Decimal(1)               // Factor in any bonuses multiplying gain here
+    },
+    gainExp() {                             // Returns your exponent to your gain of the prestige resource
+        return new Decimal(1)
+    },
+
+    layerShown() {return true},             // Returns a bool for if this layer's node should be visible in the tree.
+    branches() {
+        return ["f","g"]
+    },
+}),
 addLayer("a", {
         startData() { return {
             unlocked: true,
@@ -546,8 +605,8 @@ addLayer("a", {
             return ("Achievements")
         },
         achievements: {
-            rows: 5,
-            cols: 4,
+            rows: 6,
+            cols: 6,
             11: {
                 name: "The beginning...",
                 done() {return [player.points.gte(1)]}, // This one is a freebie
@@ -571,6 +630,18 @@ addLayer("a", {
                 done() {return player.b.points.gte(1000)},
                 goalTooltip: "1,000 BP.", // Shows when achievement is not completed
                 doneTooltip: "1,000 BP."
+            },
+            15: {
+                name: "Welcome to the basic-verse.",
+                done() {return player.b.points.gte("1e10")},
+                goalTooltip: "1e10 BP.", // Shows when achievement is not completed
+                doneTooltip: "1e10 BP."
+            },
+            16: {
+                name: "The basic multiverse.",
+                done() {return player.b.points.gte("1e20")},
+                goalTooltip: "1e20 BP.", // Shows when achievement is not completed
+                doneTooltip: "1e20 BP."
             },
             21: {
                 name: "Cheap.",
@@ -596,6 +667,18 @@ addLayer("a", {
                 goalTooltip: "Buy 25 cheapeners.", // Shows when achievement is not completed
                 doneTooltip: "Buy 25 cheapeners."
             },
+            25: {
+                name: "Every upgrade is cheap.",
+                done() {return player.c.points.gte(49)},
+                goalTooltip: "Buy 49 cheapeners.", // Shows when achievement is not completed
+                doneTooltip: "Buy 49 cheapeners."
+            },
+            26: {
+                name: "There's no purpose on doing this....",
+                done() {return player.c.points.gte(100)},
+                goalTooltip: "Buy 100 cheapeners.", // Shows when achievement is not completed
+                doneTooltip: "Buy 100 cheapeners."
+            },
             31: {
                 name: "Welcome to the darkness.",
                 done() {return player.d.points.gte(1)},
@@ -619,6 +702,18 @@ addLayer("a", {
                 done() {return player.d.points.gte(5)},
                 goalTooltip: "Get 5 darkness.", // Shows when achievement is not completed
                 doneTooltip: "Get 5 darkness."
+            },
+            35: {
+                name: "It's only darkness now.",
+                done() {return player.d.points.gte(15)},
+                goalTooltip: "Get 15 darkness.", // Shows when achievement is not completed
+                doneTooltip: "Get 15 darkness."
+            },
+            36: {
+                name: "Too much darkness.",
+                done() {return player.d.points.gte(25)},
+                goalTooltip: "Get 25 darkness.", // Shows when achievement is not completed
+                doneTooltip: "Get 25 darkness."
             },
             41: {
                 name: "Exponental.",
@@ -644,6 +739,18 @@ addLayer("a", {
                 goalTooltip: "Own 5 exponent.", // Shows when achievement is not completed
                 doneTooltip: "Own 5 exponent."
             },
+            45: {
+                name: "Insane Exponent.",
+                done() {return player.e.points.gte(10)},
+                goalTooltip: "Own 10 exponent.", // Shows when achievement is not completed
+                doneTooltip: "Own 10 exponent."
+            },
+            46: {
+                name: "{softcapped}",
+                done() {return player.e.points.gte(25)},
+                goalTooltip: "Own 25 exponent.", // Shows when achievement is not completed
+                doneTooltip: "Own 25 exponent."
+            },
             51: {
                 name: "Should be in Antimatter Dimensions.",
                 done() {return player.f.points.gte(1)},
@@ -667,6 +774,54 @@ addLayer("a", {
                 done() {return player.f.points.gte("1.81e308")},
                 goalTooltip: "Get 1.81e308 funity.", // Shows when achievement is not completed
                 doneTooltip: "Get 1.81e308 funity."
+            },
+            55: {
+                name: "This game is too fun!",
+                done() {return player.f.points.gte("1e1000")},
+                goalTooltip: "Get 1e1000 funity.", // Shows when achievement is not completed
+                doneTooltip: "Get 1e1000 funity."
+            },
+            56: {
+                name: "Rating this 10/5, too fun.",
+                done() {return player.f.points.gte("1e10000")},
+                goalTooltip: "Get 1e10000 funity.", // Shows when achievement is not completed
+                doneTooltip: "Get 1e10000 funity."
+            },
+            61: {
+                name: "Your first game.",
+                done() {return player.f.points.gte("1e10000")},
+                goalTooltip: "Make 1 game.", // Shows when achievement is not completed
+                doneTooltip: "Make 1 game."
+            },
+            62: {
+                name: "Your next games.",
+                done() {return player.f.points.gte("1e10000")},
+                goalTooltip: "Make 10 games.", // Shows when achievement is not completed
+                doneTooltip: "Make 10 games."
+            },
+            63: {
+                name: "Game creator.",
+                done() {return player.f.points.gte("1e10000")},
+                goalTooltip: "Make 1,000 games.", // Shows when achievement is not completed
+                doneTooltip: "Make 1,000 games."
+            },
+            64: {
+                name: "Full time dev.",
+                done() {return player.f.points.gte("1e10000")},
+                goalTooltip: "Make 1e9 games.", // Shows when achievement is not completed
+                doneTooltip: "Make 1e9 games."
+            },
+            65: {
+                name: "You need sleep.",
+                done() {return player.f.points.gte("1e10000")},
+                goalTooltip: "Make 1e20 games.", // Shows when achievement is not completed
+                doneTooltip: "Make 1e20 games."
+            },
+            66: {
+                name: "Ultimate developer.",
+                done() {return player.f.points.gte("1e10000")},
+                goalTooltip: "Make 1e100 games.", // Shows when achievement is not completed
+                doneTooltip: "Make 1e100 games."
             },
         },
         midsection: [
