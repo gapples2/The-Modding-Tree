@@ -28,12 +28,14 @@ addLayer("e", {
             player.e.softcapped = " {softcapped}"
             let logger = new Decimal(22)
             if(hasUpgrade("e",22))logger = new Decimal(10)
+            if(hasUpgrade("e",33))logger = new Decimal(5)
             if(hasUpgrade("e",24))logger = new Decimal(1.5)
             if(hasUpgrade("e",33)){expon = new Decimal(15).mul(expon.log(logger).log(2))}else{expon = new Decimal(15).add(expon.log(logger))}
         }else if(expon.gte("1e7")&&expon.lt("1e20")){
             player.e.softcapped = " {more softcapped}"
             let logger = new Decimal(150)
             if(hasUpgrade("e",22))logger = new Decimal(70)
+            if(hasUpgrade("e",33))logger = new Decimal(35)
             if(hasUpgrade("e",24))logger = new Decimal(10)
             if(hasUpgrade("e",33)){expon = new Decimal("1e7").mul(expon.log(logger).log(50).tetrate(0.1))}else{expon = new Decimal(15).add(expon.log(logger))}
         }
@@ -41,6 +43,7 @@ addLayer("e", {
             player.e.softcapped = " {super softcapped}"
             let logger = new Decimal("1e10")
             if(hasUpgrade("e",22))logger = new Decimal("1e7")
+            if(hasUpgrade("e",33))logger = new Decimal("5e5")
             if(hasUpgrade("e",24))logger = new Decimal("1e4")
             if(hasUpgrade("e",33)){expon = new Decimal("1e20").mul(expon.log(logger).log("1e4").tetrate(0.001))}else{expon = new Decimal(15).add(expon.log(logger))}
         }
@@ -48,6 +51,7 @@ addLayer("e", {
             player.e.softcapped = " {ultimately softcapped}"
             let logger = new Decimal("1e150")
             if(hasUpgrade("e",22))logger = new Decimal("1e70")
+            if(hasUpgrade("e",33))logger = new Decimal("5e55")
             if(hasUpgrade("e",24))logger = new Decimal("1e40")
             if(hasUpgrade("e",33)){expon = new Decimal("1e300").mul(expon.log(logger).log("1e8").tetrate("1e-10"))}else{expon = new Decimal(15).add(expon.log(logger))}
         }
