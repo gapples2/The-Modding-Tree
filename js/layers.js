@@ -111,23 +111,11 @@ addLayer("e", {
             cost: new Decimal(5),
             unlocked(){return hasUpgrade("e",21)}
         },
-        31: {
-            title: "Super softcap reducer",
-            description: "Reduces the softcap on the exponent by even more.",
-            cost: new Decimal(5),
-            unlocked(){return hasUpgrade("e",23)}
-        },
-        32: {
-            title: "Amazing softcap reducer",
-            description: "Reduces the softcap on the exponent by EVEN MORE.",
-            cost: new Decimal(5),
-            unlocked(){return hasUpgrade("e",31)}
-        },
         33: {
             title: "Ultimate softcap reducer",
             description: "Reduces the softcap on the exponent by EVEN MORE.",
             cost: new Decimal(5),
-            unlocked(){return hasUpgrade("e",32)}
+            unlocked(){return hasUpgrade("e",22)}
         },
         23: {
             title: "Softcap improver",
