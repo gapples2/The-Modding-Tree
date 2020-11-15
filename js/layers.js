@@ -28,46 +28,43 @@ addLayer("e", {
             player.e.softcapped = " {softcapped}"
             let logger = new Decimal(22)
             if(hasUpgrade("e",22))logger = new Decimal(10)
-            if(hasUpgrade("e",33))logger = new Decimal(5)
+            if(hasUpgrade("e",33))logger = new Decimal(4)
             if(hasUpgrade("e",24))logger = new Decimal(1.5)
-            if(hasUpgrade("e",33)){expon = new Decimal(15).mul(expon.log(logger).log(2))}else{expon = new Decimal(15).add(expon.log(logger))}
+            if(hasUpgrade("e",23)){expon = new Decimal(15).mul(expon.log(logger).log(2))}else{expon = new Decimal(15).add(expon.log(logger))}
         }else if(expon.gte("1e7")&&expon.lt("1e20")){
             player.e.softcapped = " {more softcapped}"
             let logger = new Decimal(150)
             if(hasUpgrade("e",22))logger = new Decimal(70)
-            if(hasUpgrade("e",33))logger = new Decimal(35)
+            if(hasUpgrade("e",33))logger = new Decimal(25)
             if(hasUpgrade("e",24))logger = new Decimal(10)
-            if(hasUpgrade("e",33)){expon = new Decimal("1e7").mul(expon.log(logger).log(50).tetrate(0.1))}else{expon = new Decimal(15).add(expon.log(logger))}
+            if(hasUpgrade("e",23)){expon = new Decimal("1e7").mul(expon.log(logger).log(50).tetrate(0.1))}else{expon = new Decimal(15).add(expon.log(logger))}
         }
         else if(expon.gte("1e30")&&expon.lt("1e300")){
             player.e.softcapped = " {super softcapped}"
             let logger = new Decimal("1e10")
             if(hasUpgrade("e",22))logger = new Decimal("1e7")
-            if(hasUpgrade("e",33))logger = new Decimal("5e5")
+            if(hasUpgrade("e",33))logger = new Decimal("1e5")
             if(hasUpgrade("e",24))logger = new Decimal("1e4")
-            if(hasUpgrade("e",33)){expon = new Decimal("1e20").mul(expon.log(logger).log("1e4").tetrate(0.001))}else{expon = new Decimal(15).add(expon.log(logger))}
+            if(hasUpgrade("e",23)){expon = new Decimal("1e20").mul(expon.log(logger).log("1e4").tetrate(0.001))}else{expon = new Decimal(15).add(expon.log(logger))}
         }
-        else if(expon.gte("1e300")&&expon.lt("1e1000")){
+        else if(expon.gte("1e300")){
             player.e.softcapped = " {ultimately softcapped}"
             let logger = new Decimal("1e150")
             if(hasUpgrade("e",22))logger = new Decimal("1e70")
-            if(hasUpgrade("e",33))logger = new Decimal("5e55")
+            if(hasUpgrade("e",33))logger = new Decimal("1e50")
             if(hasUpgrade("e",24))logger = new Decimal("1e40")
-            if(hasUpgrade("e",33)){expon = new Decimal("1e300").mul(expon.log(logger).log("1e8").tetrate("1e-10"))}else{expon = new Decimal(15).add(expon.log(logger))}
-        }
-        else if(expon.gte("1e1000")){
-            player.e.softcapped = " {hardcapped}"
-            expon=new Decimal("1e100")
+            if(hasUpgrade("e",23)){expon = new Decimal("1e300").mul(expon.log(logger).log("1e8").tetrate("1e-10"))}else{expon = new Decimal(15).add(expon.log(logger))}
         }
         else{player.e.softcapped=""}
         if(inChallenge("t",11))expon=expon.tetrate(0.7)
+        expon=expon.tetrate(layers.me.effect().tetrate(2))
         return expon
     },
     canBuyMax(){return hasMilestone("t",1)},
     effectDescription(){return `raising your point gain to ^${format(layers[this.layer].effect())}${player.e.softcapped}.`},
     gainMult() { // Calculate the multiplier for main currency from bonuses
         mult = new Decimal(1)
-        if(hasUpgrade("e",14))mult=mult.div(8)
+        if(hasUpgrade("e",14))mult=mult.div(400)
         if(hasUpgrade("e",43))mult=mult.pow(5)
         return mult
     },
@@ -121,11 +118,23 @@ addLayer("e", {
             title: "Softcap improver",
             description: "Makes the softcapped exponent multiply instead of add.",
             cost: new Decimal(5),
-            unlocked(){return hasUpgrade("e",22)}
+            unlocked(){return hasUpgrade("e",33)}
+        },
+        31: {
+            title: "The booster",
+            description: "Adds 0.2 to the math generation base.",
+            cost: new Decimal(6),
+            unlocked(){return hasUpgrade("e",33)}
+        },
+        32: {
+            title: "The upgrade booster",
+            description: "Boosts the previous upgrade by ^0.6.",
+            cost: new Decimal(6),
+            unlocked(){return hasUpgrade("e",33)}
         },
         14: {
             title: "More exponents",
-            description: "Divides exponent cost by 8.",
+            description: "Divides exponent cost by 400.",
             cost: new Decimal(7),
             unlocked(){return hasUpgrade("e",33)}
         },
@@ -138,7 +147,7 @@ addLayer("e", {
         34: {
             title: "The ultimate upgrade",
             description: "Point gain is increased by 2.",
-            cost: new Decimal(8),
+            cost: new Decimal(9),
             unlocked(){return hasUpgrade("e",24)}
         },
         41: {
@@ -162,7 +171,7 @@ addLayer("e", {
         44: {
             title: "The Ultimate Exponent",
             description: "Squares your math gain BEFORE the exponent effect.",
-            cost: new Decimal(14),
+            cost: new Decimal(15),
             unlocked(){return hasUpgrade("e",43)}
         },
     },
@@ -212,7 +221,7 @@ addLayer("t", {
     },
 
     layerShown() { return true },            // Returns a bool for if this layer's node should be visible in the tree.
-    branches:["e"],
+    branches:["e","me"],
     upgrades: {
         rows: 4,
         cols: 4,
@@ -326,4 +335,38 @@ addLayer("t", {
             done() { return player.t.points.gte(2) }
         },
     }
+})
+
+addLayer("me", {
+    startData() { return {                  // startData is a function that returns default data for a layer. 
+        unlocked: true,                     // You can add more variables here to add them to your layer.
+        points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+    }},
+    name: "mega exponents", // This is optional, only used in a few places, If absent it just uses the layer id.
+    symbol: "^x3", // This appears on the layer's node. Default is the id with the first letter capitalized
+    color: "#00FFFF",                       // The color for this layer, which affects many elements.
+    resource: "mega exponents",            // The name of this layer's main prestige resource.
+    row: 2,                                 // The row this layer is on (0 is the first row).
+    effect(){
+        let expon = new Decimal(1).add(player["me"].points).log(69).add(1)
+        return expon
+    },
+    effectDescription(){return `double tetrating your exponent effect by ^^^${format(layers[this.layer].effect())} AFTER the softcap.`},
+    baseResource: "exponents",                 // The name of the resource your prestige gain is based on.
+    baseAmount() { return player.e.points },  // A function to return the current amount of baseResource.
+
+    requires: new Decimal("2.47e150"),              // The amount of the base needed to  gain 1 of the prestige currency.
+                                            // Also the amount required to unlock the layer.
+
+    type: "normal",                         // Determines the formula used for calculating prestige currency.
+    exponent: 0.1,                          // "normal" prestige gain is (currency^exponent).
+
+    gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
+        return new Decimal(1)               // Factor in any bonuses multiplying gain here.
+    },
+    gainExp() {                             // Returns your exponent to your gain of the prestige resource.
+        return new Decimal(1)
+    },
+
+    layerShown() { return true }            // Returns a bool for if this layer's node should be visible in the tree.
 })

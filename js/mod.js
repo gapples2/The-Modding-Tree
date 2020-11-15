@@ -13,8 +13,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0",
-	name: "Literally nothing",
+	num: "0.1",
+	name: "exponents",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -40,6 +40,10 @@ function getPointGen() {
 
 	let gain = new Decimal(1)
 	if(hasUpgrade("e",11))gain=gain.add(1)
+	let gainAdd = new Decimal(0)
+	if(hasUpgrade("e",31))gainAdd=gainAdd.add(0.2)
+	if(hasUpgrade("e",32))gainAdd=gainAdd.pow(0.6)
+	gain=gain.add(gainAdd)
 	if(hasUpgrade("t",21)&&inChallenge("t",11))gain=gain.add(1)
 	if(hasUpgrade("t",22)&&inChallenge("t",11))gain=gain.add(1)
 	if(hasUpgrade("t",23)&&inChallenge("t",11))gain=gain.add(2)
@@ -65,7 +69,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e280000000"))
+	return player.points.gte(new Decimal(10).pow(10).pow(308))
 }
 
 
