@@ -53,6 +53,7 @@ function getPointGen() {
 	gain = gain.pow(layers.e.effect())
 	if(hasUpgrade("e",41))gain=gain.pow(1.2)
 	if(hasUpgrade("e",42))gain=gain.pow(1.2)
+	gain=gain.mul(layers.me.effect2())
 	if(inChallenge("t",11))gain=gain.tetrate(0.3)
 
 	return gain
@@ -69,7 +70,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte("1F308")
+	return player.me.points=="(e^NaN)NaN"
 }
 
 

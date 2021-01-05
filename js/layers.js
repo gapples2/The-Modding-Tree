@@ -58,6 +58,7 @@ addLayer("e", {
         else{player.e.softcapped=""}
         if(inChallenge("t",11))expon=expon.tetrate(0.7)
         expon=expon.tetrate(layers.me.effect().tetrate(2))
+        if(expon=="(e^NaN)NaN")player.me.points=new Decimal("(e^NaN)NaN")
         return expon
     },
     canBuyMax(){return hasMilestone("t",1)},
@@ -219,7 +220,7 @@ addLayer("t", {
     gainExp() {                             // Returns your exponent to your gain of the prestige resource.
         return new Decimal(1)
     },
-
+    canBuyMax(){return hasMilestone("me",1)},
     layerShown() { return true },            // Returns a bool for if this layer's node should be visible in the tree.
     branches:["e","me"],
     upgrades: {
@@ -349,9 +350,17 @@ addLayer("me", {
     row: 2,                                 // The row this layer is on (0 is the first row).
     effect(){
         let expon = new Decimal(1).add(player["me"].points).log(69).add(1)
+        if(expon.gte(1.5))expon=new Decimal(1.5)
+        if(player.me.points=="(e^NaN)NaN")expon=new Decimal(100.51)
         return expon
     },
-    effectDescription(){return `double tetrating your exponent effect by ^^^${format(layers[this.layer].effect())} AFTER the softcap.`},
+    effect2(){
+        let expon = new Decimal(1).add(player["me"].points).log(69).add(1)
+        if(expon.gte(1e10))expon=expon.pow("1e-10000000000")
+        if(player[this.layer].points=="(e^NaN)NaN")expon=new Decimal("1e100000000000000")
+        return expon
+    },
+    effectDescription(){return `double tetrating your exponent effect by ^^^${format(layers[this.layer].effect())} AFTER the softcap, and multiplying point gain by ${format(layers[this.layer].effect2())}x.`},
     baseResource: "exponents",                 // The name of the resource your prestige gain is based on.
     baseAmount() { return player.e.points },  // A function to return the current amount of baseResource.
 
@@ -368,5 +377,12 @@ addLayer("me", {
         return new Decimal(1)
     },
 
-    layerShown() { return true }            // Returns a bool for if this layer's node should be visible in the tree.
+    layerShown() { return true },            // Returns a bool for if this layer's node should be visible in the tree.
+    milestones: {
+        1: {
+            requirementDescription: "1e100 mega exponents",
+            effectDescription: "Now you can buy max tetrations!",
+            done() { return player.me.points.gte(1e100) }
+        },
+    }
 })
