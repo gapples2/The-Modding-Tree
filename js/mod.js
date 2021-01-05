@@ -65,7 +65,6 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	"Current endgame: 20 exponents"
 ]
 
 // Determines when the game "ends"
