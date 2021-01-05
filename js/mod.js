@@ -13,8 +13,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1",
-	name: "exponents",
+	num: "0.2",
+	name: "actually updated",
 }
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
@@ -25,8 +25,8 @@ function getStartPoints(){
     return new Decimal(modInfo.initialStartPoints)
 }
 function giveStuff(){
-    player.t.points = 1
-    player.e.points = 31
+    player.t.points = new Decimal(1)
+    player.e.points = new Decimal(31)
 }
 // Determines if it should show points/sec
 function canGenPoints(){
