@@ -1,11 +1,11 @@
 let modInfo = {
 	name: "The ??? Tree",
-	id: "mymod",
-	author: "nobody",
-	pointsName: "points",
+	id: "theultimatelylongtreelol",
+	author: "gapples2",
+	pointsName: "_",
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
+	initialStartPoints: new Decimal (0), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
 }
@@ -13,15 +13,14 @@ let modInfo = {
 // Set your version in num and name
 let VERSION = {
 	num: "0.0",
-	name: "Literally nothing",
+	name: "copying off of pg132 while eating apples",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.0</h3><br>
-		- Added things.<br>
-		- Added stuff.`
+	<h3>v0.0: copying off of pg132 while eating apples</h3><br>
+		- Added apples.`
 
-let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
+let winText = `oh nice you won now wait for the next update`
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
 // (The ones here are examples, all official functions are already taken care of)
@@ -42,11 +41,14 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(1)
+	gain=gain.mul(getRebuyableEffect("a",11))
+	gain=gain.mul(layers.b.effect())
 	return gain
 }
 
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
 function addedPlayerData() { return {
+	unlocks:{b:false}
 }}
 
 // Display extra things at the top of the page
@@ -55,7 +57,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e280000000"))
+	return player.b.points.gte(1)
 }
 
 
@@ -71,3 +73,15 @@ function maxTickLength() {
 // you can cap their current resources with this.
 function fixOldSave(oldVersion){
 }
+var controlDown = false
+var shiftDown = false
+
+window.addEventListener('keydown', function(event) {
+	if (event.keyCode == 16) shiftDown = true;
+	if (event.keyCode == 17) controlDown = true;
+}, false);
+
+window.addEventListener('keyup', function(event) {
+	if (event.keyCode == 16) shiftDown = false;
+	if (event.keyCode == 17) controlDown = false;
+}, false);

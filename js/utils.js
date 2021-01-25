@@ -630,6 +630,9 @@ function inChallenge(layer, id){
 		return tmp[layer].challenges[challenge].countsAs.includes(id)
 }
 
+function upgradeUnlocked(layer,id){
+	return hasUpgrade(layer,id)
+}
 // ************ Misc ************
 
 var onTreeTab = true
