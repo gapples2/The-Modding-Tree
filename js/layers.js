@@ -218,7 +218,7 @@ addLayer("a", {
             content: ["main-display",["prestige-button",function(){return "Somehow create "}],"blank","upgrades"],
         },
         "Rebuyables": {
-            content: ["buyables"],
+            content: ["main-display","buyables"],
         }
     }
 })

@@ -12,13 +12,14 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0",
+	num: "0.001",
 	name: "copying off of pg132 while eating apples",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.0: copying off of pg132 while eating apples</h3><br>
-		- Added apples.`
+	<h3>v0.000: copying off of pg132 while eating apples</h3><br>
+		- Added apples.<br>
+		v0.001: amount now displays while checking rebuyables`
 
 let winText = `oh nice you won now wait for the next update`
 
