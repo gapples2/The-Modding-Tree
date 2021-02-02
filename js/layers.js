@@ -7,15 +7,18 @@ function getRebuyableEffect(layer,id){
         if(id==11){
             let boost = base.pow(amt)
             if(boost.gte(1e10))boost=D(1e8).mul(boost.pow(0.25))
+            if(boost.gte(1e30))boost=D(1e33).mul(boost.pow(0.15))
             return boost
         }
         if(id==12){
             let boost = base.mul(amt)
             if(boost.gte(50))boost=D(7.5).mul(boost.pow(hasUpgrade("a",22)?0.6:0.5))
+            if(boost.gte(300))boost=D(75).mul(boost.pow(0.25))
             return boost
         }
         if(id==21){
             let boost = base.mul(amt)
+            if(boost.gte(25))boost=boost.pow(0.5).mul(5)
             return boost
         }
         if(id==22){
@@ -115,7 +118,7 @@ addLayer("a", {
         11: {
             cost() { return new Decimal(getBuyableAmt(this.layer, this.id)).add(2).pow(getBuyableAmt(this.layer, this.id).div(2).add(1)).div(2).floor() },
             display() {
-                return getRebuyableDisplay([`<h1>Eat the Apples!<br>____________</h1><br><br><h2>Amount:</h2> <b>${getBuyableAmt(this.layer, this.id)}${getFreeRebuyables(this.layer, this.id).gte(1)?`+${getFreeRebuyables(this.layer, this.id)}`:""}.</b><br><br><h2>Cost:</h2> <b>`,[`${format(this.cost())}`,`floor(((x+2)^(x/2))/2)`],` apples.</b><br><br><h2>Effect:</h2> <b>+`,[`${format(getRebuyableEffect(this.layer, this.id))}`,`(${format(getRebuyableBase(this.layer, this.id))}^x)`],`* more points${getRebuyableEffect(this.layer, this.id).gte(1e10)?" {softcapped}":""}.</b>`])
+                return getRebuyableDisplay([`<h2>Eat the Apples!<br>____________</h2><br><br><h2>Amount:</h2> <b>${getBuyableAmt(this.layer, this.id)}${getFreeRebuyables(this.layer, this.id).gte(1)?`+${getFreeRebuyables(this.layer, this.id)}`:""}.</b><br><br><h2>Cost:</h2> <b>`,[`${format(this.cost())}`,`floor(((x+2)^(x/2))/2)`],` apples.</b><br><br><h2>Effect:</h2> <b>+`,[`${format(getRebuyableEffect(this.layer, this.id))}`,`(${format(getRebuyableBase(this.layer, this.id))}^x)`],`* more points${getRebuyableEffect(this.layer, this.id).gte(1e36)?" {wallcapped}":getRebuyableEffect(this.layer, this.id).gte(1e10)?" {softcapped}":""}.</b>`])
             },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
@@ -127,7 +130,7 @@ addLayer("a", {
         12: {
             cost() { return new Decimal(getBuyableAmt(this.layer, this.id)).add(2).mul(1.25).pow(getBuyableAmt(this.layer, this.id)).add(2).floor() },
             display() {
-                return getRebuyableDisplay([`<h1>Wash the Apples!<br>____________</h1><br><br><h2>Amount:</h2> <b>${getBuyableAmt(this.layer, this.id)}${getFreeRebuyables(this.layer, this.id).gte(1)?`+${getFreeRebuyables(this.layer, this.id)}`:""}.</b><br><br><h2>Cost:</h2> <b>`,[`${format(this.cost())}`,`floor((((x+2)*1.5)^x)+2)`],` apples.</b><br><br><h2>Effect:</h2> <b>+`,[`${format(getRebuyableEffect(this.layer, this.id))}`,`(x*${format(getRebuyableBase(this.layer, this.id))})`],` "Eat the Apples" base${getRebuyableEffect(this.layer, this.id).gte(50)?" {softcapped}":""}.</b>`])
+                return getRebuyableDisplay([`<h2>Wash the Apples!<br>____________</h2><br><br><h2>Amount:</h2> <b>${getBuyableAmt(this.layer, this.id)}${getFreeRebuyables(this.layer, this.id).gte(1)?`+${getFreeRebuyables(this.layer, this.id)}`:""}.</b><br><br><h2>Cost:</h2> <b>`,[`${format(this.cost())}`,`floor((((x+2)*1.5)^x)+2)`],` apples.</b><br><br><h2>Effect:</h2> <b>+`,[`${format(getRebuyableEffect(this.layer, this.id))}`,`(x*${format(getRebuyableBase(this.layer, this.id))})`],` "Eat the Apples" base${getRebuyableEffect(this.layer, this.id).gte(300)?" {wallcapped}":getRebuyableEffect(this.layer, this.id).gte(50)?" {softcapped}":""}.</b>`])
             },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
@@ -139,7 +142,7 @@ addLayer("a", {
         21: {
             cost() { return new Decimal(getBuyableAmt(this.layer, this.id)).add(2).mul(1.25).pow(getBuyableAmt(this.layer, this.id)).pow(1.5).add(34).floor() },
             display() {
-                return getRebuyableDisplay([`<h1>Purify the Apples!<br>____________</h1><br><br><h2>Amount:</h2> <b>${getBuyableAmt(this.layer, this.id)}${getFreeRebuyables(this.layer, this.id).gte(1)?`+${getFreeRebuyables(this.layer, this.id)}`:""}.</b><br><br><h2>Cost:</h2> <b>`,[`${format(this.cost())}`,`floor((((x+2)*1.5)^x)^1.5+34)`],` apples.</b><br><br><h2>Effect:</h2> <b>+`,[`${format(getRebuyableEffect(this.layer, this.id),3)}`,`(x*${format(getRebuyableBase(this.layer, this.id),3)})`],` "Wash the Apples" base.</b>`])
+                return getRebuyableDisplay([`<h2>Purify the Apples!<br>____________</h2><br><br><h2>Amount:</h2> <b>${getBuyableAmt(this.layer, this.id)}${getFreeRebuyables(this.layer, this.id).gte(1)?`+${getFreeRebuyables(this.layer, this.id)}`:""}.</b><br><br><h2>Cost:</h2> <b>`,[`${format(this.cost())}`,`floor((((x+2)*1.5)^x)^1.5+34)`],` apples.</b><br><br><h2>Effect:</h2> <b>+`,[`${format(getRebuyableEffect(this.layer, this.id),3)}`,`(x*${format(getRebuyableBase(this.layer, this.id),3)})`],` "Wash the Apples" base${getRebuyableEffect(this.layer, this.id).gte(25)?" {softcapped}":""}.</b>`])
             },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
@@ -151,7 +154,7 @@ addLayer("a", {
         22: {
             cost() { return new Decimal(getBuyableAmt(this.layer, this.id)).add(3).mul(2).pow(getBuyableAmt(this.layer, this.id)).pow(2).add(99).floor() },
             display() {
-                return getRebuyableDisplay([`<h1>Pick the Apples!<br>____________</h1><br><br><h2>Amount:</h2> <b>${getBuyableAmt(this.layer, this.id)}${getFreeRebuyables(this.layer, this.id).gte(1)?`+${getFreeRebuyables(this.layer, this.id)}`:""}.</b><br><br><h2>Cost:</h2> <b>`,[`${format(this.cost())}`,`floor((((x+3)*2)^x)^2+99)`],` apples.</b><br><br><h2>Effect:</h2> <b>+`,[`${format(getRebuyableEffect(this.layer, this.id),3)}`,`(x*${format(getRebuyableBase(this.layer, this.id),3)})`],` "Purify the Apples" base.</b>`])
+                return getRebuyableDisplay([`<h2>Pick the Apples!<br>____________</h2><br><br><h2>Amount:</h2> <b>${getBuyableAmt(this.layer, this.id)}${getFreeRebuyables(this.layer, this.id).gte(1)?`+${getFreeRebuyables(this.layer, this.id)}`:""}.</b><br><br><h2>Cost:</h2> <b>`,[`${format(this.cost())}`,`floor((((x+3)*2)^x)^2+99)`],` apples.</b><br><br><h2>Effect:</h2> <b>+`,[`${format(getRebuyableEffect(this.layer, this.id),3)}`,`(x*${format(getRebuyableBase(this.layer, this.id),3)})`],` "Purify the Apples" base.</b>`])
             },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
@@ -214,13 +217,28 @@ addLayer("a", {
         },
     },
     tabFormat: {
-        "Main": {
+        "Upgrades": {
             content: ["main-display",["prestige-button",function(){return "Somehow create "}],"blank","upgrades"],
         },
         "Rebuyables": {
-            content: ["main-display","buyables"],
+            content: ["main-display",["prestige-button",function(){return "Somehow create "}],"blank","buyables"],
         }
-    }
+    },
+    doReset(layer){
+        if(layers[layer].row=="side")return
+        if(layer=="a")return
+        let keep = []
+        if (hasUpgrade("b", 11)) keep=[11,12,13,14]
+        let upgs = []
+        for(let a=0; a<keep.length;a++){
+            if(keep==[])break;
+            if(keep[a]==undefined)continue;
+            if(hasUpgrade("a",keep[a])){upgs.push(keep[a])}
+        }
+        player.a.points = new Decimal(0)
+        layerDataReset("a")
+        player.a.upgrades=upgs
+    },
 })
 addLayer("b", {
     startData() { return { 
@@ -238,7 +256,7 @@ addLayer("b", {
     requires: new Decimal(1e20),
 
     type: "normal",
-    exponent: 0.45,
+    exponent: 0.1,
 
     gainMult() {
         return new Decimal(1)
@@ -252,6 +270,7 @@ addLayer("b", {
         let boost=player.b.points
         boost=boost.mul(10).pow(0.25).mul(2)
         boost=boost.add(1)
+        if(hasUpgrade("b",13))boost=boost.pow(2)
         return boost
     },
     effectDescription(){
@@ -261,6 +280,39 @@ addLayer("b", {
         if(player.a.points.gte(5e19))player.unlocks.b=true
     },
     branches:["a"],
+    upgrades: {
+        rows: 3,
+        cols: 3,
+        11: {
+            title: "Balls are Better",
+            description: "Keep the first row of upgrades on ball reset.",
+            cost: new Decimal(3),
+            unlocked(){return player.b.total.gte(4)},
+        },
+        12: {
+            title: "Powerful Apples",
+            description: "Apples boost point gain.",
+            cost: new Decimal(5),
+            unlocked(){return hasUpgrade("b",11)},
+            effect(){
+                let boost = player.a.points.pow(0.2).mul(2).pow(1.25).add(1)
+                return boost
+            },
+            effectDisplay(){return `${format(this.effect())}*`}
+        },
+        13: {
+            title: "Balls are OP",
+            description: "Square the ball effect.",
+            cost: new Decimal(1000),
+            unlocked(){return hasUpgrade("b",12)},
+        },
+        14: {
+            title: "Auto-creation",
+            description: "Automatically get 10% of apples per second.",
+            cost: new Decimal(1e309),
+            unlocked(){return hasUpgrade("b",12)},
+        }
+    },
 })
 addLayer("goals", {
     startData() { return { 
@@ -289,37 +341,81 @@ addLayer("goals", {
 
     layerShown() { return true },
     achievements: {
-        rows: 9,
+        rows: 10,
         cols: 10,
         11: {
             name: "1",
             tooltip: "Get 1 apple",
-            done(){return player.a.points.gte(1)}
+            done(){return player.a.points.gte(1)},
+            style:{width:"75px",height:"75px"}
         },
         12: {
             name: "2",
             tooltip: "Get 10 apples",
-            done(){return player.a.points.gte(10)}
+            done(){return player.a.points.gte(10)},
+            style:{width:"75px",height:"75px"}
         },
         13: {
             name: "3",
             tooltip: "Pick 1 apple",
-            done(){return getBuyableAmt("a",22).gte(1)}
+            done(){return getBuyableAmt("a",22).gte(1)},
+            style:{width:"75px",height:"75px"}
         },
         14: {
             name: "4",
-            tooltip: "Eat 15 apples",
-            done(){return getBuyableAmt("a",11).gte(15)}
+            tooltip: "Wash 5 apples",
+            done(){return getBuyableAmt("a",12).gte(5)},
+            style:{width:"75px",height:"75px"}
         },
         15: {
             name: "5",
+            tooltip: "Purify 5 apples",
+            done(){return getBuyableAmt("a",21).gte(5)},
+            style:{width:"75px",height:"75px"}
+        },
+        16: {
+            name: "6",
+            tooltip: "Buy 3 apple upgrades.",
+            done(){return hasUpgrade("a",13)},
+            style:{width:"75px",height:"75px"}
+        },
+        17: {
+            name: "7",
+            tooltip: "Wash 10 apples.",
+            done(){return getBuyableAmt("a",12).gte(10)},
+            style:{width:"75px",height:"75px"}
+        },
+        18: {
+            name: "8",
+            tooltip: "Eat 23 apples",
+            done(){return getBuyableAmt("a",11).gte(23)},
+            style:{width:"75px",height:"75px"}
+        },
+        19: {
+            name: "9",
+            tooltip: "Buy 8 apple upgrades.",
+            done(){return hasUpgrade("a",24)},
+            style:{width:"75px",height:"75px"}
+        },
+        21: {
+            name: "10",
             tooltip: "Get 1 ball",
-            done(){return player.b.points.gte(1)}
+            done(){return player.b.points.gte(1)},
+            style:{width:"75px",height:"75px"}
+        },
+        22: {
+            name: "11",
+            tooltip: "Get 4 balls.",
+            done(){return player.b.points.gte(4)},
+            style:{width:"75px",height:"75px"}
         },
     },
     tabFormat: {
         "Main": {
-            content: ["main-display","blank","achievements"],
+            content: [["display-text",
+            function() { return `Achievements` },
+            {"font-size": "32px" }],"blank","achievements"],
         },
-    }
+    },
+    tooltip(){return "Achievements 1-100"}
 })

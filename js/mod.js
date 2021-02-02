@@ -44,6 +44,7 @@ function getPointGen() {
 	let gain = new Decimal(1)
 	gain=gain.mul(getRebuyableEffect("a",11))
 	gain=gain.mul(layers.b.effect())
+	if(hasUpgrade("b",12))gain=gain.mul(upgradeEffect("b",12))
 	return gain
 }
 
