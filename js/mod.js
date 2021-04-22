@@ -1,7 +1,7 @@
 let modInfo = {
-	name: "The ??? Tree",
-	id: "mymod",
-	author: "nobody",
+	name: "The Tree of Challenges",
+	id: "nadauciduasudcbasuicdbnascu",
+	author: "gapples2",
 	pointsName: "points",
 	discordName: "",
 	discordLink: "",
