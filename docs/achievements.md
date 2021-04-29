@@ -13,11 +13,9 @@ Achievements should be formatted like this:
 
 ```js
 achievements: {
-    rows: # of rows,
-    cols: # of columns,
     11: {
-        name: "Achievement",
-        etc
+        name: "Blah",
+        more features
     },
     etc
 }
