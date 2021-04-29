@@ -12,10 +12,12 @@ Challenges are stored in the following format:
 
 ```js
 challenges: {
+    rows: # of rows,
+    cols: # of columns,
     11: {
         name: "Ouch",
         challengeDescription: "description of ouchie",
-        goal: new Decimal(100),
+        goal: new ExpantaNum(100),
         etc
     },
     etc

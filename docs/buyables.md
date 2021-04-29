@@ -1,6 +1,6 @@
 # Buyables
 
-Buyables are usually things that can be bought multiple times with scaling costs. They come with optional buttons that can be used for respeccing or selling buyables, among other things.
+Buyables are usually things that can be bought multiple times with scaling costs. If you set a respec function, the player can reset the purchases to get their currency back.
 
 The amount of a buyable owned is a `Decimal`. 
 
@@ -14,13 +14,15 @@ Buyables should be formatted like this:
 
 ```js
 buyables: {
+    rows: # of rows,
+    cols: # of columns,
     11: {
-        cost(x) { return new Decimal(1).mul(x || getBuyableAmt(this.layer, this.id)) },
-        display() { return "Blah" },
+        cost() { return new ExpantaNum(1).mul(getBuyableAmount(this.layer, this.id)) },
+        display() { return "Buyable" },
         canAfford() { return player[this.layer].points.gte(this.cost()) },
         buy() {
             player[this.layer].points = player[this.layer].points.sub(this.cost())
-            setBuyableAmount(this.layer, this.id, getBuyableAmt(this.layer, this.id).add(1))
+            setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
         },
         etc
     },
@@ -59,15 +61,3 @@ Including a `sellOne` or `sellAll` function will cause an additional button to a
 - sellOne/sellAll(): **optional**. Called when the button is pressed. The standard use would be to decrease/reset the amount of the buyable, and possibly return some currency to the player.
 
 - canSellOne/canSellAll(): **optional**. booleans determining whether or not to show the buttons. If  "canSellOne/All" is absent but "sellOne/All" is present, the appropriate button will always show.
-
-
-To add a respec button, or something similar, add the respecBuyables function to the main buyables object (not individual buyables).
-You can use these features along with it: 
-
-- respecBuyables(): **optional**. This is called when the button is pressed (after a toggleable confirmation message).
-
-- respecText: **optional**. Text to display on the respec Button.
-
-- showRespec(): **optional**. A function determining whether or not to show the button, if respecBuyables is defined. Defaults to true if absent.
-
-- respecMessage: **optional**. A custom confirmation message on respec, in place of the default one.
