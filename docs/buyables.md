@@ -14,8 +14,6 @@ Buyables should be formatted like this:
 
 ```js
 buyables: {
-    rows: # of rows,
-    cols: # of columns,
     11: {
         cost() { return new ExpantaNum(1).mul(getBuyableAmount(this.layer, this.id)) },
         display() { return "Buyable" },
