@@ -73,6 +73,7 @@ function getStartLayerData(layer) {
 		layerdata.resetTime = 0;
 
 	layerdata.buyables = getStartBuyables(layer);
+	if (layerdata.noRespecConfirm === undefined) layerdata.noRespecConfirm = false
 	if (layerdata.clickables == undefined)
 		layerdata.clickables = getStartClickables(layer);
 	layerdata.spentOnBuyables = new ExpantaNum(0);
