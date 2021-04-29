@@ -45,7 +45,7 @@ function setupTempData(layerData, tmpData, funcsData) {
 		if (layerData[item] == null) {
 			tmpData[item] = null
 		}
-		else if (layerData[item] instanceof Decimal)
+		else if (layerData[item] instanceof ExpantaNum)
 			tmpData[item] = layerData[item]
 		else if (Array.isArray(layerData[item])) {
 			tmpData[item] = []
@@ -63,7 +63,7 @@ function setupTempData(layerData, tmpData, funcsData) {
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
 			funcsData[item] = layerData[item]
-			tmpData[item] = new Decimal(1) // The safest thing to put probably?
+			tmpData[item] = new ExpantaNum(1) // The safest thing to put probably?
 		} else {
 			tmpData[item] = layerData[item]
 		}
@@ -192,7 +192,7 @@ function constructBarStyles(layer){
 	for (id in layers[layer].bars){
 		if (id !== "layer") {
 			let bar = tmp[layer].bars[id]
-			if (bar.progress instanceof Decimal)
+			if (bar.progress instanceof ExpantaNum)
 				bar.progress = bar.progress.toNumber()
 			bar.progress = (1 -Math.min(Math.max(bar.progress, 0), 1)) * 100
 

@@ -1,6 +1,7 @@
 // ************ Save stuff ************
 function save() {
 	localStorage.setItem(modInfo.id, btoa(unescape(encodeURIComponent(JSON.stringify(player)))));
+  //ok it saved fine so the problem must be when loading
 }
 function startPlayerBase() {
 	return {
@@ -65,19 +66,16 @@ function getStartLayerData(layer) {
 	if (layerdata.unlocked === undefined)
 		layerdata.unlocked = true;
 	if (layerdata.total === undefined)
-		layerdata.total = new Decimal(0);
+		layerdata.total = new ExpantaNum(0);
 	if (layerdata.best === undefined)
-		layerdata.best = new Decimal(0);
+		layerdata.best = new ExpantaNum(0);
 	if (layerdata.resetTime === undefined)
 		layerdata.resetTime = 0;
-	if (layerdata.forceTooltip === undefined)
-		layerdata.forceTooltip = false;
 
 	layerdata.buyables = getStartBuyables(layer);
-	if (layerdata.noRespecConfirm === undefined) layerdata.noRespecConfirm = false
 	if (layerdata.clickables == undefined)
 		layerdata.clickables = getStartClickables(layer);
-	layerdata.spentOnBuyables = new Decimal(0);
+	layerdata.spentOnBuyables = new ExpantaNum(0);
 	layerdata.upgrades = [];
 	layerdata.milestones = [];
 	layerdata.achievements = [];
@@ -89,7 +87,7 @@ function getStartBuyables(layer) {
 	if (layers[layer].buyables) {
 		for (id in layers[layer].buyables)
 			if (isPlainObject(layers[layer].buyables[id]))
-				data[id] = new Decimal(0);
+				data[id] = new ExpantaNum(0);
 	}
 	return data;
 }
@@ -117,9 +115,9 @@ function fixSave() {
 
 	for (layer in layers) {
 		if (player[layer].best !== undefined)
-			player[layer].best = new Decimal(player[layer].best);
+			player[layer].best = new ExpantaNum(player[layer].best);
 		if (player[layer].total !== undefined)
-			player[layer].total = new Decimal(player[layer].total);
+			player[layer].total = new ExpantaNum(player[layer].total);
 
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 
@@ -146,12 +144,17 @@ function fixData(defaultData, newData) {
 			else
 				fixData(defaultData[item], newData[item]);
 		}
-		else if (defaultData[item] instanceof Decimal) { // Convert to Decimal
+		else if (defaultData[item] instanceof ExpantaNum) { // Convert to ExpantaNum
 			if (newData[item] === undefined)
 				newData[item] = defaultData[item];
 
-			else
-				newData[item] = new Decimal(newData[item]);
+			else{
+                let newItemThing=new ExpantaNum(0)
+				newItemThing.array = newData[item].array
+				newItemThing.sign = newData[item].sign
+				newItemThing.layer = newData[item].layer
+                newData[item] = newItemThing
+            } 
 		}
 		else if ((!!defaultData[item]) && (typeof defaultData[item] === "object")) {
 			if (newData[item] === undefined || (typeof defaultData[item] !== "object"))
@@ -217,7 +220,7 @@ function NaNcheck(data) {
 				NaNalert = true;
 			}
 		}
-		else if (data[item] instanceof Decimal) { // Convert to Decimal
+		else if (data[item] instanceof ExpantaNum) { // Convert to ExpantaNum
 		}
 		else if ((!!data[item]) && (data[item].constructor === Object)) {
 			NaNcheck(data[item]);

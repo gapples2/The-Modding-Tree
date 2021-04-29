@@ -8,16 +8,14 @@ addLayer("c", {
         position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: true,
-			points: new Decimal(0),
-            best: new Decimal(0),
-            total: new Decimal(0),
+			points: new ExpantaNum(0),
+            best: new ExpantaNum(0),
+            total: new ExpantaNum(0),
             buyables: {}, // You don't actually have to initialize this one
             beep: false,
-            thingy: "pointy",
-            otherThingy: 10,
         }},
         color: "#4BDC13",
-        requires: new Decimal(10), // Can be a function that takes requirement increases into account
+        requires: new ExpantaNum(10), // Can be a function that takes requirement increases into account
         resource: "lollipops", // Name of prestige currency
         baseResource: "points", // Name of resource prestige is based on
         baseAmount() {return player.points}, // Get the current amount of baseResource
@@ -27,17 +25,17 @@ addLayer("c", {
         roundUpCost: false, // True if the cost needs to be rounded up (use when baseResource is static?)
 
         // For normal layers, gain beyond [softcap] points is put to the [softcapPower]th power
-        softcap: new Decimal(1e100), 
-        softcapPower: new Decimal(0.5), 
+        softcap: new ExpantaNum(1e100), 
+        softcapPower: new ExpantaNum(0.5), 
         canBuyMax() {}, // Only needed for static layers with buy max
         gainMult() { // Calculate the multiplier for main currency from bonuses
-            mult = new Decimal(1)
+            mult = new ExpantaNum(1)
             if (hasUpgrade(this.layer, 166)) mult = mult.times(2) // These upgrades don't exist
 			if (hasUpgrade(this.layer, 120)) mult = mult.times(upgradeEffect(this.layer, 120))
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
-            return new Decimal(1)
+            return new ExpantaNum(1)
         },
         row: 0, // Row the layer is in on the tree (0 is the first row)
         effect() {
@@ -78,7 +76,8 @@ addLayer("c", {
                 },
         },
         challenges: {
-
+            rows: 2,
+    		cols: 12,
 		    11: {
                 name: "Fun",
                 completionLimit: 3,
@@ -99,16 +98,17 @@ addLayer("c", {
             },
         }, 
         upgrades: {
-
+            rows: 2,
+            cols: 3,
             11: {
                 title: "Generator of Genericness",
                 description: "Gain 1 Point every second.",
-                cost: new Decimal(1),
+                cost: new ExpantaNum(1),
                 unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
             12: {
                 description: "Point generation is faster based on your unspent Lollipops.",
-                cost: new Decimal(1),
+                cost: new ExpantaNum(1),
                 unlocked() { return (hasUpgrade(this.layer, 11))},
                 effect() { // Calculate bonuses from the upgrade. Can return a single value or an object with multiple values
                     let ret = player[this.layer].points.add(1).pow(player[this.layer].upgrades.includes(24)?1.1:(player[this.layer].upgrades.includes(14)?0.75:0.5)) 
@@ -143,11 +143,13 @@ addLayer("c", {
                 currencyDisplayName: "exhancers", // Use if using a nonstandard currency
                 currencyInternalName: 11, // Use if using a nonstandard currency
 
-                cost: new Decimal(3),
+                cost: new ExpantaNum(3),
                 unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
         },
         buyables: {
+            rows: 1,
+            cols: 12,
             showRespec: true,
             respec() { // Optional, reset things and give back your currency. Having this function makes a respec button appear
                 player[this.layer].points = player[this.layer].points.add(player[this.layer].spentOnBuyables) // A built-in thing to keep track of this but only keeps a single value
@@ -155,7 +157,6 @@ addLayer("c", {
                 doReset(this.layer, true) // Force a reset
             },
             respecText: "Respec Thingies", // Text on Respec button, optional
-            respecMessage: "Are you sure? Respeccing these doesn't accomplish much.",
             11: {
                 title: "Exhancers", // Optional, displayed at the top in a larger font
                 cost(x=player[this.layer].buyables[this.id]) { // cost for buying xth buyable, can be an object if there are multiple currencies
@@ -209,8 +210,8 @@ addLayer("c", {
         }, // Useful for if you gain secondary resources or have other interesting things happen to this layer when you reset it. You gain the currency after this function ends.
 
         hotkeys: [
-            {key: "c", description: "C: reset for lollipops or whatever", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
-            {key: "ctrl+c", description: "Ctrl+c: respec things", onPress(){respecBuyables(this.layer)}, unlocked() {return hasUpgrade('c', '22')}}  ,
+            {key: "c", description: "C: reset for lollipops or whatever", onPress(){if (canReset(this.layer)) doReset(this.layer)}, unlocked() {return player.points.gte(10)}},
+            {key: "ctrl+c", description: "Ctrl+c: respec things", onPress(){if (player[this.layer].unlocked) respecBuyables(this.layer)}},
         ],
         increaseUnlockOrder: [], // Array of layer names to have their order increased when this one is first unlocked
 
@@ -295,15 +296,12 @@ addLayer("c", {
                     "prestige-button", "resource-display",
                     ["blank", "5px"], // Height
                     ["raw-html", function() {return "<button onclick='console.log(`yeet`)'>'HI'</button>"}],
-                    ["display-text", "Name your points!"],
-                    ["text-input", "thingy"],
                     ["display-text",
-                        function() {return 'I have ' + format(player.points) + ' ' + player.c.thingy + ' points!'},
+                        function() {return 'I have ' + format(player.points) + ' pointy points!'},
                         {"color": "red", "font-size": "32px", "font-family": "Comic Sans MS"}],
                     "h-line", "milestones", "blank", "upgrades", "challenges"],
             },
             thingies: {
-                prestigeNotify: true,
                 style() {return  {'background-color': '#222222'}},
                 buttonStyle() {return {'border-color': 'orange'}},
                 content:[ 
@@ -340,9 +338,7 @@ addLayer("c", {
                 unlocked() {return (hasUpgrade("c", 13))},
                 content:[
                     ["raw-html", function() {return "<h1> C O N F I R M E D </h1>"}], "blank",
-                    ["microtabs", "stuff", {'width': '600px', 'height': '350px', 'background-color': 'brown', 'border-style': 'solid'}],
-                    ["display-text", "Adjust how many points H gives you!"],
-                    ["slider", ["otherThingy", 1, 30]],
+                    ["microtabs", "stuff", {'width': '600px', 'height': '350px', 'background-color': 'brown', 'border-style': 'solid'}]
                 ]
             }
 
@@ -376,12 +372,12 @@ addLayer("c", {
 addLayer("f", {
     startData() { return {
         unlocked: false,
-        points: new Decimal(0),
+        points: new ExpantaNum(0),
         boop: false,
-        clickables: {[11]: "Start"}, // Optional default Clickable state
+        clickables: {[11]: "Start"} // Optional default Clickable state
     }},
     color: "#FE0102",
-    requires() {return new Decimal(10)}, 
+    requires() {return new ExpantaNum(10)}, 
     resource: "farm points", 
     baseResource: "points", 
     baseAmount() {return player.points},
@@ -418,8 +414,9 @@ addLayer("f", {
     },
     // This is also non minimal, a Clickable!
     clickables: {
-
-        masterButtonPress() {
+        rows: 1,
+        cols: 1,
+        masterButtonPress() { // Optional, reset things and give back your currency. Having this function makes a respec button appear
             if (getClickableState(this.layer, 11) == "Borkened...")
                 player[this.layer].clickables[11] = "Start"
         },
@@ -481,7 +478,7 @@ addLayer("f", {
 addLayer("a", {
         startData() { return {
             unlocked: true,
-			points: new Decimal(0),
+			points: new ExpantaNum(0),
         }},
         color: "yellow",
         resource: "achievement power", 
@@ -491,6 +488,8 @@ addLayer("a", {
         },
         achievementPopups: true,
         achievements: {
+            rows: 2,
+            cols: 3,
             11: {
                 image: "discord.png",
                 name: "Get me!",

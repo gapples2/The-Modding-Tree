@@ -14,40 +14,36 @@ var systemComponents = {
 	'tree-node': {
 		props: ['layer', 'abb', 'size'],
 		template: `
-		<button v-if="nodeShown(layer)"       
+		<button v-if="nodeShown(layer)"
 			v-bind:id="layer"
 			v-on:click="function() {
-				if (shiftDown) player[layer].forceTooltip = !player[layer].forceTooltip
-				else if(tmp[layer].isLayer) {showTab(layer)}
+				if(tmp[layer].isLayer) {showTab(layer)}
 				else {run(layers[layer].onClick, layers[layer])}
 			}"
 
-
-			v-bind:class="{
-				treeNode: tmp[layer].isLayer,
-				treeButton: !tmp[layer].isLayer,
-				smallNode: size == 'small',
-				[layer]: true,
-				tooltipBox: true,
-				forceTooltip: player[layer].forceTooltip,
-				ghost: tmp[layer].layerShown == 'ghost',
-				hidden: !tmp[layer].layerShown,
-				locked: tmp[layer].isLayer ? !(player[layer].unlocked || tmp[layer].canReset) : !(tmp[layer].canClick),
-				notify: tmp[layer].notify && player[layer].unlocked,
-				resetNotify: tmp[layer].prestigeNotify,
-				can: ((player[layer].unlocked || tmp[layer].isLayer) && tmp[layer].isLayer) || (!tmp[layer].isLayer && tmp[layer].canClick),
-			}"
-			v-bind:style="tmp[layer].computedNodeStyle">
-			<span v-html="(abb !== '' && tmp[layer].image === undefined) ? abb : '&nbsp;'"></span>
-			<tooltip
-			:text="(tmp[layer].tooltip == '') ? false : (tmp[layer].isLayer) ? (
+			v-bind:tooltip="(tmp[layer].tooltip == '') ? false : (tmp[layer].isLayer) ? (
 				player[layer].unlocked ? (tmp[layer].tooltip ? tmp[layer].tooltip : formatWhole(player[layer].points) + ' ' + tmp[layer].resource)
 				: (tmp[layer].tooltipLocked ? tmp[layer].tooltipLocked : 'Reach ' + formatWhole(tmp[layer].requires) + ' ' + tmp[layer].baseResource + ' to unlock (You have ' + formatWhole(tmp[layer].baseAmount) + ' ' + tmp[layer].baseResource + ')')
 			)
 			: (
 				tmp[layer].canClick ? (tmp[layer].tooltip ? tmp[layer].tooltip : 'I am a button!')
 				: (tmp[layer].tooltipLocked ? tmp[layer].tooltipLocked : 'I am a button!')
-			)"></tooltip>
+			)
+			"
+			v-bind:class="{
+				treeNode: tmp[layer].isLayer,
+				treeButton: !tmp[layer].isLayer,
+				smallNode: size == 'small',
+				[layer]: true,
+				ghost: tmp[layer].layerShown == 'ghost',
+				hidden: !tmp[layer].layerShown,
+				locked: tmp[layer].isLayer ? !(player[layer].unlocked || tmp[layer].canReset) : !(tmp[layer].canClick),
+				notify: tmp[layer].notify,
+				resetNotify: tmp[layer].prestigeNotify,
+				can: ((player[layer].unlocked || tmp[layer].isLayer) && tmp[layer].isLayer) || (!tmp[layer].isLayer && tmp[layer].canClick),
+			}"
+			v-bind:style="tmp[layer].computedNodeStyle">
+			{{(abb !== '' && tmp[layer].image === undefined) ? abb : '&nbsp;'}}
 		</button>
 		`
 	},
@@ -122,6 +118,8 @@ var systemComponents = {
             Made by {{modInfo.author}}	
         </span>
         <br>
+        The ExpantaNum Tree <a v-bind:href="'https://github.com/unsoftcapped3/The-Modding-Tree-Expantanum/blob/main/changelog.md'" target="_blank" class="link" v-bind:style = "{'font-size': '14px', 'display': 'inline'}" >{{EN_VERSION.enNum}}</a> by upvote and \sum_{n=1}^{+\infty}n = -1/12
+        <br>
         The Modding Tree <a v-bind:href="'https://github.com/Acamaeda/The-Modding-Tree/blob/master/changelog.md'" target="_blank" class="link" v-bind:style = "{'font-size': '14px', 'display': 'inline'}" >{{TMT_VERSION.tmtNum}}</a> by Acamaeda
         <br>
         The Prestige Tree made by Jacorb and Aarex
@@ -168,12 +166,5 @@ var systemComponents = {
         template: `
         <button v-bind:class="back" onclick="goBack()">←</button>
         `
-    },
-
-
-	'tooltip' : {
-		props: ['text'],
-		template: `<div class="tooltip" v-html="text"></div>
-		`
-	}
+    }
 }
