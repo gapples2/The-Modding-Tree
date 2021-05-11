@@ -42,8 +42,8 @@ function setupTemp() {
 	tmp.other = {
 		screenWidth: window.innerWidth,
 		splitScreen: window.innerWidth >=1024,
-		lastPoints: player.points || new Decimal(0),
-		oomps: new Decimal(0),
+		lastPoints: player.points || D(0),
+		oomps: D(0),
 
 		held: {
 			time: null,

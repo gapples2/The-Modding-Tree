@@ -28,6 +28,7 @@ function sumValues(x) {
 
 function format(decimal, precision = 2) {
     decimal = new ExpantaNum(decimal)
+    if(decimal.toFixed(2)<0.01&&decimal.gt(0))return "<0.01" 
     let fmt = decimal.toString(precision)
     if(decimal.gte(1000)&&decimal.lt("10^^5")){
       let powers = fmt.split("e")
@@ -49,7 +50,10 @@ function format(decimal, precision = 2) {
       fmt=powers.join("e")
       return fmt}
     else if(precision>0){
-      if(fmt.split(".").length==1){fmt=fmt+".00"}
+      if(fmt.split(".").length==1&&precision==5){fmt=fmt+".00000"}
+      else if(fmt.split(".").length==1&&precision==4){fmt=fmt+".0000"}
+      else if(fmt.split(".").length==1&&precision==3){fmt=fmt+".000"}
+      else if(fmt.split(".").length==1&&precision<3){fmt=fmt+".00"}
       else if(fmt.split(".")[1].length==1){fmt=fmt+"0"}
     }
   return fmt

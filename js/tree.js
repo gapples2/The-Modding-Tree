@@ -7,6 +7,8 @@ var layoutInfo = {
     
 }
 
+let D = ExpantaNum
+
 
 // A "ghost" layer which offsets other layers in the tree
 addNode("blank", {
@@ -16,5 +18,14 @@ addNode("blank", {
 
 
 addLayer("tree-tab", {
-    tabFormat: [["tree", function() {return (layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)}]]
+    tabFormat: {
+        "Energy": {
+            embedLayer: "e"
+        },
+        "Batteries": {
+            embedLayer: "b",
+            unlocked(){return layers.b.layerShown()}
+        }
+        //[["tree", function() {return (layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)}]]
+    }
 })

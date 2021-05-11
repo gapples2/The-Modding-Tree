@@ -65,10 +65,10 @@ function updateWidth() {
 function updateOomps(diff)
 {
 	tmp.other.oompsMag = 0
-	if (player.points.lte(new Decimal(1e100))) return
+	if (player.points.lte(D(1e100))) return
 
-	var pp = new Decimal(player.points);
-	var lp = tmp.other.lastPoints || new Decimal(0);
+	var pp = D(player.points);
+	var lp = tmp.other.lastPoints || D(0);
 	if (pp.gt(lp)) {
 		if (pp.gte("10^^8")) {
 			pp = pp.slog(1e10)

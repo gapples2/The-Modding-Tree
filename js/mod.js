@@ -1,11 +1,11 @@
 let modInfo = {
-	name: "The Modding Tree",
-	id: "mymod",
-	author: "",
+	name: "The Fuel Tree",
+	id: "vdasvdsvdasv",
+	author: "gapples2",
 	pointsName: "points",
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new ExpantaNum (10), // Used for hard resets and new players
+	initialStartPoints: new ExpantaNum (0), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
 }
@@ -13,19 +13,18 @@ let modInfo = {
 // Set your version in num and name
 let VERSION = {
 	num: "0.0",
-	name: "",
+	name: "fuel",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.0</h3><br>
-		- Added things.<br>
-		- Added stuff.`
+		- first 2 layers`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
 // (The ones here are examples, all official functions are already taken care of)
-var doNotCallTheseFunctionsEveryTick = ["blowUpEverything"]
+var doNotCallTheseFunctionsEveryTick = ["blowUpEverything","refundUpgs"]
 
 function getStartPoints(){
     return new ExpantaNum(modInfo.initialStartPoints)
@@ -33,7 +32,7 @@ function getStartPoints(){
 
 // Determines if it should show points/sec
 function canGenPoints(){
-	return true
+	return hasUpgrade("e",11)
 }
 
 // Calculate points/sec!
@@ -41,7 +40,10 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new ExpantaNum(0)
 
-	let gain = new ExpantaNum(1)
+	let gain = (player.e.points.lt(1)?player.e.points:player.e.points.pow(0.5).pow(hasUpgrade("e",24)?1.2:1))
+	if(hasUpgrade("b",11))gain=gain.mul(upgradeEffect("b",11))
+	if(hasUpgrade("e",13))gain=gain.mul(hasUpgrade("e",22)?4:2)
+	if(hasUpgrade("b",21)&&gain.gte(1))gain=gain.pow(2)
 	return gain
 }
 
@@ -55,7 +57,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return false
+	return player.points.gte("1.8ee308")
 }
 
 
