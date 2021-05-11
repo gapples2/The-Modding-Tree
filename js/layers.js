@@ -23,6 +23,7 @@ addLayer("e", {
         burnFuel: false,
         gainfuelauto: D(0),
         buyMax: false,
+        autotoggle: false,
     }},
     color: "#ffff00",
     requires: new ExpantaNum(10), // Can be a function that takes requirement increases into account
@@ -99,17 +100,21 @@ addLayer("e", {
     update(diff){
         player.e.bestFuel=this.fuelCapacity()
         if(!hasUpgrade("e",32)){
+            if(player.e.autotoggle&&player.e.fuel.eq(0))player.e.getFuel=true
             if(player.e.getFuel){
                 let amt = 0.999**diff
                 player.e.fuel = player.e.fuel.add(player.points.mul(1-amt).times(this.fuelMult())).min(player.e.bestFuel)
+                if(player.e.fuel.eq(player.e.bestFuel))player.e.getFuel=false
             }
-            if(player.e.burnFuel&&player.e.fuel.gt(0)){
+            if(player.e.autotoggle&&player.e.fuel.eq(player.e.bestFuel))player.e.burnFuel=true
+            if(player.e.burnFuel){
                 let amt = D(diff).times(this.burnSpeed())
                 if(player.e.fuel.minus(amt).lte(0)){
                     amt=player.e.fuel
+                    player.e.burnFuel=false
                 }
-                player.e.points = player.e.points.add(amt.times(layers.e.gainMult()))
                 player.e.fuel = player.e.fuel.minus(amt)
+                player.e.points = player.e.points.add(amt.times(layers.e.gainMult()))
             }
         }
         else{
@@ -376,7 +381,6 @@ addLayer("b", {
                 ["display-text",function(){return "You have <h2 style='color: rgb(170, 170, 0);text-shadow: rgb(170 170 0) 0px 0px 10px;'>"+format(player.b.points,0)+"</h2> batter"+(player.b.points.eq(1)?"y":"ies")+", "+layers.b.effectDesc()}],
                 "milestones",
             ],
-            unlocked(){return player.b.best.gte(2)}
         }
     },
     effectDesc(){
@@ -483,6 +487,12 @@ addLayer("b", {
         }
     },
     milestones: {
+        2: {
+            requirementDescription: "1 battery",
+            effectDescription: "Auto-toggle.",
+            done() { return player.b.points.gte(1) },
+            toggles: [["e","autotoggle"]]
+        },
         0: {
             requirementDescription: "3 batteries",
             effectDescription: "You can pick another path.",
