@@ -12,7 +12,7 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0",
+	num: "0.001",
 	name: "fuel",
 }
 
@@ -44,6 +44,7 @@ function getPointGen() {
 	if(hasUpgrade("b",11))gain=gain.mul(upgradeEffect("b",11))
 	if(hasUpgrade("e",13))gain=gain.mul(hasUpgrade("e",22)?4:2)
 	if(hasUpgrade("b",21)&&gain.gte(1))gain=gain.pow(2)
+	if(player.e.getFuel&&!player.e.fuel.eq(player.e.bestFuel))gain=gain.minus(player.points.div(1000))
 	return gain
 }
 

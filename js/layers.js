@@ -47,7 +47,7 @@ addLayer("e", {
                 "main-display",
                 ["bar","fuel"],
                 "blank",
-                ["row",[["clickable",11],["clickable",12]]]
+                ["row",[["clickable",11],["clickable",12]]],
             ],
         },
         "Upgrades":{
@@ -73,9 +73,10 @@ addLayer("e", {
             ],
             unlocked(){return (hasUpgrade("e",22)||player.b.best.gte(2))&&!hasUpgrade("e",31)}
         },
-        "Challenges": {
-            content: [],
-            unlocked: false
+        "Formulas": {
+            content: [
+                ["display-text",`Fuel Gain: (points * 0.001 * multipliers)<br>Point Loss: 0.1 * multipliers * burnSpeed)<br><br>Energy Gain: (0.1 * multipliers * burnSpeed)<br>Fuel Loss: (burnSpeed)`]
+            ],
         },
     },
     bars: {
@@ -101,14 +102,11 @@ addLayer("e", {
             if(player.e.getFuel){
                 let amt = 0.999**diff
                 player.e.fuel = player.e.fuel.add(player.points.mul(1-amt).times(this.fuelMult())).min(player.e.bestFuel)
-                if(player.e.fuel.eq(player.e.bestFuel))player.e.getFuel=false
-                else player.points = player.points.mul(amt)
             }
-            if(player.e.burnFuel){
+            if(player.e.burnFuel&&player.e.fuel.gt(0)){
                 let amt = D(diff).times(this.burnSpeed())
                 if(player.e.fuel.minus(amt).lte(0)){
                     amt=player.e.fuel
-                    player.e.burnFuel=false
                 }
                 player.e.points = player.e.points.add(amt.times(layers.e.gainMult()))
                 player.e.fuel = player.e.fuel.minus(amt)
