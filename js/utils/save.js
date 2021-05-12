@@ -1,7 +1,6 @@
 // ************ Save stuff ************
 function save() {
 	localStorage.setItem(modInfo.id, btoa(unescape(encodeURIComponent(JSON.stringify(player)))));
-  //ok it saved fine so the problem must be when loading
 }
 function startPlayerBase() {
 	return {
@@ -20,9 +19,10 @@ function startPlayerBase() {
 		hasNaN: false,
 		hideChallenges: false,
 		showStory: true,
+		forceOneTab: false,
 		points: modInfo.initialStartPoints,
 		subtabs: {},
-		lastSafeTab: (layoutInfo.showTree ? "none" : layoutInfo.startTab)
+		lastSafeTab: (readData(layoutInfo.showTree) ? "none" : layoutInfo.startTab)
 	};
 }
 function getStartPlayer() {
@@ -66,21 +66,26 @@ function getStartLayerData(layer) {
 	if (layerdata.unlocked === undefined)
 		layerdata.unlocked = true;
 	if (layerdata.total === undefined)
-		layerdata.total = new ExpantaNum(0);
+		layerdata.total = decimalZero;
 	if (layerdata.best === undefined)
-		layerdata.best = new ExpantaNum(0);
+		layerdata.best = decimalZero;
 	if (layerdata.resetTime === undefined)
 		layerdata.resetTime = 0;
+	if (layerdata.forceTooltip === undefined)
+		layerdata.forceTooltip = false;
 
 	layerdata.buyables = getStartBuyables(layer);
 	if (layerdata.noRespecConfirm === undefined) layerdata.noRespecConfirm = false
 	if (layerdata.clickables == undefined)
 		layerdata.clickables = getStartClickables(layer);
-	layerdata.spentOnBuyables = new ExpantaNum(0);
+	layerdata.spentOnBuyables = decimalZero;
 	layerdata.upgrades = [];
 	layerdata.milestones = [];
+	layerdata.lastMilestone = null;
 	layerdata.achievements = [];
 	layerdata.challenges = getStartChallenges(layer);
+	layerdata.grid = getStartGrid(layer);
+
 	return layerdata;
 }
 function getStartBuyables(layer) {
@@ -88,7 +93,7 @@ function getStartBuyables(layer) {
 	if (layers[layer].buyables) {
 		for (id in layers[layer].buyables)
 			if (isPlainObject(layers[layer].buyables[id]))
-				data[id] = new ExpantaNum(0);
+				data[id] = decimalZero;
 	}
 	return data;
 }
@@ -110,15 +115,29 @@ function getStartChallenges(layer) {
 	}
 	return data;
 }
+function getStartGrid(layer) {
+	let data = {};
+	if (! layers[layer].grid) return data
+	if (layers[layer].grid.maxRows === undefined) layers[layer].grid.maxRows=layers[layer].grid.rows
+	if (layers[layer].grid.maxCols === undefined) layers[layer].grid.maxCols=layers[layer].grid.cols
+
+	for (let y = 1; y <= layers[layer].grid.maxRows; y++) {
+		for (let x = 1; x <= layers[layer].grid.maxCols; x++) {
+			data[100*y + x] = layers[layer].grid.getStartData(100*y + x)
+		}
+	}
+	return data;
+}
+
 function fixSave() {
 	defaultData = getStartPlayer();
 	fixData(defaultData, player);
 
 	for (layer in layers) {
 		if (player[layer].best !== undefined)
-			player[layer].best = new ExpantaNum(player[layer].best);
+			player[layer].best = new Decimal(player[layer].best);
 		if (player[layer].total !== undefined)
-			player[layer].total = new ExpantaNum(player[layer].total);
+			player[layer].total = new Decimal(player[layer].total);
 
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 
@@ -145,17 +164,12 @@ function fixData(defaultData, newData) {
 			else
 				fixData(defaultData[item], newData[item]);
 		}
-		else if (defaultData[item] instanceof ExpantaNum) { // Convert to ExpantaNum
+		else if (defaultData[item] instanceof Decimal) { // Convert to Decimal
 			if (newData[item] === undefined)
 				newData[item] = defaultData[item];
 
-			else{
-                let newItemThing=new ExpantaNum(0)
-				newItemThing.array = newData[item].array
-				newItemThing.sign = newData[item].sign
-				newItemThing.layer = newData[item].layer
-                newData[item] = newItemThing
-            } 
+			else
+				newData[item] = new Decimal(newData[item]);
 		}
 		else if ((!!defaultData[item]) && (typeof defaultData[item] === "object")) {
 			if (newData[item] === undefined || (typeof defaultData[item] !== "object"))
@@ -175,7 +189,7 @@ function load() {
 	if (get === null || get === undefined)
 		player = getStartPlayer();
 	else
-		player = Object.assign(getStartPlayer(), JSON.parse(atob(get)));
+		player = Object.assign(getStartPlayer(), JSON.parse(decodeURIComponent(escape(atob(get)))));
 	fixSave();
 
 	if (player.offlineProd) {
@@ -193,6 +207,7 @@ function load() {
 	setupTemp();
 	updateTemp();
 	updateTemp();
+	updateTabFormats()
 	loadVue();
 }
 function setupModInfo() {
@@ -221,7 +236,7 @@ function NaNcheck(data) {
 				NaNalert = true;
 			}
 		}
-		else if (data[item] instanceof ExpantaNum) { // Convert to ExpantaNum
+		else if (data[item] instanceof Decimal) { // Convert to Decimal
 		}
 		else if ((!!data[item]) && (data[item].constructor === Object)) {
 			NaNcheck(data[item]);
