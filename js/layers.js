@@ -819,7 +819,7 @@ addLayer("r", {
             direction: LEFT,
             width: 200,
             height: 50,
-            progress() { return player.r.scrapTimer==0?1:(player.r.scrapTimer/5)-(player.r.scrapTimer/9) },
+            progress() { return player.r.scrapTimer==0?1:player.r.scrapTimer/5 },
         },
     }
 })
