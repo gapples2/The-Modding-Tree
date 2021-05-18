@@ -561,7 +561,6 @@ function loadVue() {
 			format,
 			formatWhole,
 			formatTime,
-			formatSmall,
 			focused,
 			getThemeName,
 			layerunlocked,
