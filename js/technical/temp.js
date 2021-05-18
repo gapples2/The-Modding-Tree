@@ -45,6 +45,8 @@ function setupTemp() {
 	tmp.other = {
 		lastPoints: player.points || decimalZero,
 		oomps: decimalZero,
+		screenWidth: 0,
+		screenHeight: 0,
     }
 
 	updateWidth()
@@ -153,7 +155,7 @@ function updateClickableTemp(layer)
 
 function setupBuyables(layer) {
 	for (id in layers[layer].buyables) {
-		if (!isNaN(id)) {
+		if (isPlainObject(layers[layer].buyables[id])) {
 			let b = layers[layer].buyables[id]
 			b.actualCostFunction = b.cost
 			b.cost = function(x) {
