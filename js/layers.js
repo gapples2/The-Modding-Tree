@@ -765,7 +765,7 @@ addLayer("r", {
             canClick(){return true},
         },
         21: {
-            display() {return "Craft "+(player.r.canCraft[1]>1.5?player.r.canCraft[1]+"x ":"")+tmp.r.dataToRecipe+".\n\n(does nothing yet)"},
+            display() {return "Craft "+(player.r.canCraft[1]>1.5?player.r.canCraft[1]+"x ":"")+tmp.r.dataToRecipe+"."},
             onClick() {craftItem(recipeIds[player.r.canCraft[0]],player.r.canCraft[1])},
             canClick(){return tmp.r.dataToRecipe!="nothing"},
         }
