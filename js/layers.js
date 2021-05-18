@@ -233,8 +233,8 @@ addLayer("e", {
             unlocked(){return !hasUpgrade("e",32)}
         },
         21: {
-            display() {return (player.e.buyMax?"Mode: Buy Max":"Mode: Buy Single")},
-            onClick() {player.e.buyMax = !player.e.buyMax},
+            display() {return (player.b.buyMax?"Mode: Buy Max":"Mode: Buy Single")},
+            onClick() {player.b.buyMax = !player.b.buyMax},
             canClick(){return true},
         }
     },
