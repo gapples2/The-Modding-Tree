@@ -87,7 +87,7 @@ function updateOomps(diff)
 function constructBarStyle(layer, id) {
 	let bar = tmp[layer].bars[id]
 	let style = {}
-	if (bar.progress instanceof Decimal)
+	if (bar.progress instanceof ExpantaNum)
 		bar.progress = bar.progress.toNumber()
 	bar.progress = (1 -Math.min(Math.max(bar.progress, 0), 1)) * 100
 

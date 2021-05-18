@@ -1,3 +1,62 @@
+let loadedRecipes = false // load recipes so i dont have to manually load them all
+let recipeRequirements = {} // add every recipe requiremnt to make searching for a recipe easier and less hard on your computer
+let recipeIds = {scrap:0} // also add recipe ids
+let idToRecipe = {0:"scrap"} // and this
+let recipeColors = {0:"#555555","nothing":"#ffffff"} // and finally this
+
+function loadRecipeRequirements(){
+    if(!loadedRecipes){
+        // time to start loading the recipes
+        loadedRecipes=true
+
+        // first get the recipe stuff
+        let recipes = layers.r.recipes
+        let keys = Object.keys(recipes)
+
+        // next get every recipe to add the requirements
+        keys.forEach(key=>{
+
+            // 1. create object, add the ids
+            recipeRequirements[key]={}
+            recipeIds[key]=recipes[key].id
+            idToRecipe[recipes[key].id]=key
+            if(recipes[key].color)recipeColors[recipes[key].id]=recipes[key].color
+
+            // 2. state variables. pattern is something like "#### ####", which would be a furnace
+            let data = recipes[key].data
+            let pattern = recipes[key].pattern.join("").split("")
+
+            // 3. go through each character in the pattern to get recipe requirements
+            let num = 0
+            pattern.forEach(k=>{
+
+                // d is recipes[key].data[char]
+                let d = data[k]
+                // if it's not in the object add it
+                if(!(d in recipeRequirements[key])&&k!=" ")recipeRequirements[key][d]=0
+                if(!(key+"Grid" in recipeRequirements)&&k!=" ")recipeRequirements[key+"Grid"]={}
+                // add 1
+                if(k!=" "){
+                    recipeRequirements[key][d]++
+                    // now save recipe pattern to use it for the grid
+                    recipeRequirements[key+"Grid"][[101,102,103,201,202,203,301,302,303][num]]=d
+                }
+                num++
+            })
+        })
+        // no returning anything because there's nothing to return!
+    }
+}
+
+function compareObject(obj1,obj2){
+    let keys = [Object.keys(obj1),Object.keys(obj2)]
+    if(keys[0].length!=keys[1].length||keys[0].join(" ")!=keys[1].join(" "))return false
+    for(let x=0;x<keys[0].length;x++){
+        if(obj1[keys[0][x]]!=obj2[keys[0][x]])return false
+    }
+    return true
+}
+
 function unlockedBatteryUpg(id){
     if(hasUpgrade("b",id)||hasMilestone("b",1))return true
     let row = Math.floor(id/10)
@@ -11,6 +70,38 @@ function unlockedBatteryUpg(id){
     return true
 }
 
+function inventoryItem(id){
+    if(id==0)return player.r.scraps
+    if(!(id in player.r.inventory))return undefined
+    return player.r.inventory[id]
+}
+
+function setItemAmt(id,amt){
+    if(id==0)player.r.scraps = D(amt)
+    else{if(amt instanceof ExpantaNum){amt=amt.toFixed(0)};player.r.inventory[id]=amt}
+}
+
+function addToCraftingGrid(id){
+    player.r.grid[id]=[player.r.cSelected[0],player.r.grid[id][1]+1]
+    setItemAmt(player.r.cSelected[0],D(inventoryItem(player.r.cSelected[0])).minus(player.r.cSelected[1]))
+}
+
+function removeFromCraftingGrid(id){
+    player.r.grid[id]=[!(player.r.grid[id][1]-1==0)?player.r.cSelected[0]:"nothing",player.r.grid[id][1]-1]
+    setItemAmt(player.r.cSelected[0],D(inventoryItem(player.r.cSelected[0])).add(player.r.cSelected[1]))
+}
+
+function craftItem(id,amt=1){
+    let costs = recipeRequirements[idToRecipe[id]+"Grid"]
+    for(let x=0;x<9;x++){
+        let i = [101,102,103,201,202,203,301,302,303][x]
+        if(costs[i])player.r.grid[i]=[!(player.r.grid[i][1]-1==0)?player.r.cSelected[0]:"nothing",player.r.grid[i][1]-1]
+    }
+    if((id==1)&&!player.r.unlocks.includes(idToRecipe[id])){amt--;player.r.unlocks.push(idToRecipe[id])}
+    if(!player.r.itemUnlocks.includes(id))player.r.itemUnlocks.push(id)
+    setItemAmt(id,inventoryItem(id)+amt)
+}
+
 addLayer("e", {
     name: "energy", // This is optional, only used in a few places, If absent it just uses the layer id.
     symbol: "E", // This appears on the layer's node. Default is the id with the first letter capitalized
@@ -22,8 +113,6 @@ addLayer("e", {
         getFuel: false,
         burnFuel: false,
         gainfuelauto: D(0),
-        buyMax: false,
-        autotoggle: false,
     }},
     color: "#ffff00",
     requires: new ExpantaNum(10), // Can be a function that takes requirement increases into account
@@ -100,13 +189,13 @@ addLayer("e", {
     update(diff){
         player.e.bestFuel=this.fuelCapacity()
         if(!hasUpgrade("e",32)){
-            if(player.e.autotoggle&&player.e.fuel.eq(0))player.e.getFuel=true
+            if(player.b.autotoggle&&player.e.fuel.eq(0))player.e.getFuel=true
             if(player.e.getFuel){
                 let amt = 0.999**diff
                 player.e.fuel = player.e.fuel.add(player.points.mul(1-amt).times(this.fuelMult())).min(player.e.bestFuel)
                 if(player.e.fuel.eq(player.e.bestFuel))player.e.getFuel=false
             }
-            if(player.e.autotoggle&&player.e.fuel.eq(player.e.bestFuel))player.e.burnFuel=true
+            if(player.b.autotoggle&&player.e.fuel.eq(player.e.bestFuel))player.e.burnFuel=true
             if(player.e.burnFuel){
                 let amt = D(diff).times(this.burnSpeed())
                 if(player.e.fuel.minus(amt).lte(0)){
@@ -135,11 +224,13 @@ addLayer("e", {
             display() {return (player.e.getFuel?"Stop gaining fuel.":"Start gaining fuel.")+`\n(+${format(player.points.mul(0.001).times(layers.e.fuelMult()))} fuel/sec, -${format(player.points.mul(0.001))} points/sec)`},
             onClick() {player.e.getFuel = !player.e.getFuel},
             canClick(){return player.points.gte(1)&&player.e.bestFuel.gt(player.e.fuel)},
+            unlocked(){return !hasUpgrade("e",32)}
         },
         12: {
             display() {return (player.e.burnFuel?"Stop burning fuel.":"Start burning fuel.")+`\n(+${format(layers.e.gainMult().times(layers.e.burnSpeed()))} energy/sec, -${format(layers.e.burnSpeed())} fuel/sec)`},
             onClick() {player.e.burnFuel = !player.e.burnFuel},
             canClick(){return player.e.fuel.gte(0.1)},
+            unlocked(){return !hasUpgrade("e",32)}
         },
         21: {
             display() {return (player.e.buyMax?"Mode: Buy Max":"Mode: Buy Single")},
@@ -241,7 +332,7 @@ addLayer("e", {
             display() { return "<h3>Multiply fuel cap by "+format(hasUpgrade("e",23)?3:2)+".\n\nCost: "+format(this.cost())+" energy\n\nAmount: "+getBuyableAmount(this.layer, this.id)+"\n\nEffect: "+format(buyableEffect(this.layer, this.id))+"</h3>" },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
-                if(player.e.buyMax)return this.buyMax()
+                if(player.b.buyMax)return this.buyMax()
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -250,7 +341,6 @@ addLayer("e", {
             buyMax(){
                 let maxAmt = player.e.points.div(5).add(0.001).logBase(3).max(0).floor().minus(getBuyableAmount(this.layer, this.id))
                 if(this.canAfford()){
-                    maxAmt=maxAmt.add(1)
                     player[this.layer].points = player[this.layer].points.sub(this.cost(maxAmt.add(getBuyableAmount(this.layer, this.id).minus(1))))
                     setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(maxAmt))
                 }
@@ -261,7 +351,7 @@ addLayer("e", {
             display() { return "<h3>Get "+format(player.b.best.div(100).add(0.01).mul(hasUpgrade("b",24)?3:1))+" more energy per fuel.\n\nCost: "+format(this.cost())+" energy\n\nAmount: "+getBuyableAmount(this.layer, this.id)+"\n\nEffect: "+format(buyableEffect(this.layer, this.id))+"</h3>" },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
-                if(player.e.buyMax)return this.buyMax()
+                if(player.b.buyMax)return this.buyMax()
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -270,7 +360,6 @@ addLayer("e", {
             buyMax(){
                 let maxAmt = player.e.points.div(10).add(0.001).logBase(5).max(0).floor().minus(getBuyableAmount(this.layer, this.id))
                 if(this.canAfford()){
-                    maxAmt=maxAmt.add(1)
                     player[this.layer].points = player[this.layer].points.sub(this.cost(maxAmt.add(getBuyableAmount(this.layer, this.id).minus(1))))
                     setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(maxAmt))
                 }
@@ -281,7 +370,7 @@ addLayer("e", {
             display() { return "<h3>Gain "+format(hasUpgrade("b",34)?1.25:1.1)+"x more energy.\n\nCost: "+format(this.cost())+" points\n\nAmount: "+getBuyableAmount(this.layer, this.id)+"\n\nEffect: "+format(buyableEffect(this.layer, this.id))+"</h3>" },
             canAfford() { return player.points.gte(this.cost()) },
             buy() {
-                if(player.e.buyMax)return this.buyMax()
+                if(player.b.buyMax)return this.buyMax()
                 player.points = player.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -289,7 +378,6 @@ addLayer("e", {
             buyMax(){
                 let maxAmt = player.points.div(1000).add(0.001).logBase(15).max(0).floor().minus(getBuyableAmount(this.layer, this.id))
                 if(this.canAfford()){
-                    maxAmt=maxAmt.add(1)
                     player.points = player.points.sub(this.cost(maxAmt.add(getBuyableAmount(this.layer, this.id).minus(1))))
                     setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(maxAmt))
                 }
@@ -300,7 +388,7 @@ addLayer("e", {
             display() { return "<h3>Burn fuel "+format(hasUpgrade("b",32)?2.25:1.5)+"x faster.\n\nCost: "+format(this.cost())+" points\n\nAmount: "+getBuyableAmount(this.layer, this.id)+"\n\nEffect: "+format(buyableEffect(this.layer, this.id))+"</h3>" },
             canAfford() { return player.points.gte(this.cost()) },
             buy() {
-                if(player.e.buyMax)return this.buyMax()
+                if(player.b.buyMax)return this.buyMax()
                 player.points = player.points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
             },
@@ -308,7 +396,6 @@ addLayer("e", {
             buyMax(){
                 let maxAmt = player.points.div(5000).add(0.001).logBase(7).max(0).floor().minus(getBuyableAmount(this.layer, this.id))
                 if(this.canAfford()){
-                    maxAmt=maxAmt.add(1)
                     player.points = player.points.sub(this.cost(maxAmt.add(getBuyableAmount(this.layer, this.id).minus(1))))
                     setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(maxAmt))
                 }
@@ -322,6 +409,8 @@ addLayer("b", {
     startData() { return { 
         unlocked: false,
         points: D(0),
+        buyMax: false,
+        autotoggle: false,
     }},
 
     color: "#aaaa00",
@@ -489,9 +578,9 @@ addLayer("b", {
     milestones: {
         2: {
             requirementDescription: "1 battery",
-            effectDescription: "Auto-toggle.",
+            effectDescription: "Auto-toggle (Auto burn and gain fuel).",
             done() { return player.b.points.gte(1) },
-            toggles: [["e","autotoggle"]]
+            toggles: [["b","autotoggle"]]
         },
         0: {
             requirementDescription: "3 batteries",
@@ -503,5 +592,234 @@ addLayer("b", {
             effectDescription: "You can pick all 4 paths.",
             done() { return player.b.points.gte(100) }
         }
+    }
+})
+
+addLayer("r", {
+    startData() { return { 
+        unlocked: false,
+        points: D(0),
+        scrapTimer: 0,
+        scraps: D(0),
+        unlockedCrafting: false,
+        cSelected: [0,1],
+        canCraft: ["nothing",1],
+        inventory: {},
+        unlocks: [],
+        itemUnlocks: ["scrap"],
+        removeItem: false,
+    }},
+
+    color: "#654321",
+    resource: "resources",
+    row: 1,
+
+    baseResource: "points",
+    baseAmount() { return player.points },
+
+    requires: D(10),
+
+    type: "normal",
+    exponent: 0.5,
+
+    gainMult() {
+        return D(1)
+    },
+    gainExp() {
+        return D(1)
+    },
+
+    layerShown() { return player.r.unlocked },
+    update(diff){
+        if(player.points.gte("1ee308"))player.r.unlocked=true
+        player.r.scrapTimer=Math.max(0,player.r.scrapTimer-diff)
+        if(!loadedRecipes)loadRecipeRequirements()
+        if(player.r.scraps.gte(8))player.r.unlockedCrafting=true
+    },
+    canReset(){
+        return false
+    },
+    scrapGain(){
+        let gain = player.points.add(1).slog().div(3).floor()
+        return gain
+    },
+    recipes:{
+        /*
+        example:
+
+        "[name]":{
+            pattern:[
+                crafting is:
+
+                "[3 chars]",
+                "[3 more chars]",
+                "[3 more chars]"
+
+
+                furnace doesnt need this
+            ],
+            data:{
+                crafting is:
+
+                "[char]":"[name of item required]"
+
+
+                furnace is:
+
+                [id of thing]:[amt of thing]
+            },
+            id: [id],
+            color: "[color]", (optional)
+            madeIn: "[crafting/furnace]"
+        }
+        */
+        "furnace":{
+            pattern:[
+                "###",
+                "# #",
+                "###"
+            ],
+            data:{
+                "#":"scrap"
+            },
+            id: 1,
+            color: "#777777",
+            madeIn: "crafting"
+        },
+
+        // furnace recipes starts here
+
+        
+    },
+    dataToRecipe(data=player.r.grid){
+        // ik theres better ways to do this but whatever
+
+        if(!recipeIds["furnace"])return "[loading]"
+        let keys = Object.keys(data)
+        let items = []
+        let nums = {}
+        keys.forEach(key=>{
+            items.push(idToRecipe[data[key][0]])
+            if(!nums[idToRecipe[data[key][0]]]&&idToRecipe[data[key][0]])nums[idToRecipe[data[key][0]]]=0
+            if(idToRecipe[data[key][0]])nums[idToRecipe[data[key][0]]]++
+        })
+        let recipes = layers.r.recipes
+        keys = Object.keys(recipes)
+        let possible = []
+        keys.forEach(k=>{
+            if(compareObject(recipeRequirements[k],nums))possible.push(k)
+        })
+        if(possible.length==0)return "nothing"
+        let r = "nothing"
+        possible.forEach(p=>{
+            let recipe = recipes[p]
+            let pattern = recipe.pattern.join("").split("")
+            for(let x=0;x<9;x++){
+                pattern[x]=recipe.data[pattern[x]]
+            }
+            pattern=pattern.join(",")
+            items=items.join(",")
+            if(pattern==items)r=p
+        })
+        return r
+    },
+    tabFormat:{
+        "Scraps":{
+            content: [
+                ["display-text",function(){return "You have <h2 style='color: #654321;text-shadow: #654321 0px 0px 10px;'>"+format(player.r.scraps,0)+"</h2> metal scrap"+(player.r.scraps.eq(1)?"":"s")+"."}],
+                "blank",
+                ["clickable",11],
+                "blank",
+                ["bar","scrapProgress"]
+            ]
+        },
+        "Crafting":{
+            content: [
+                "grid",
+                ["display-text",function(){return "Item selected: "+(idToRecipe[player.r.cSelected[0]]=="scrap"?"metal ":"")+idToRecipe[player.r.cSelected[0]]+"."}],
+                "blank",
+                ["row",[["clickable",13],["clickable",21]]],
+                "blank",
+                ["display-text","Inventory"],
+                "blank",
+                ["layer-proxy",["craftinginvgrid",["grid"]]]
+            ]
+        },
+        "Furnace":{
+            content:[
+
+            ]
+        }
+    },
+    clickables: {
+        rows: 4,
+        cols: 3,
+        11: {
+            display() {return "Search for "+format(layers.r.scrapGain(),0)+" metal scrap"+(layers.r.scrapGain().eq(1)?"":"s")+"."+(player.r.scrapTimer!=0?"\n\n"+format(player.r.scrapTimer)+" more seconds until you can search for metal scraps again.":"")},
+            onClick() {player.r.scraps=player.r.scraps.add(layers.r.scrapGain());player.r.scrapTimer=5},
+            canClick(){return player.r.scrapTimer==0},
+        },
+        13: {
+            display() {return "Currently "+(player.r.removeItem?"removing items from ":"adding items to ")+"the crafting grid."},
+            onClick() {player.r.removeItem=!player.r.removeItem},
+            canClick(){return true},
+        },
+        21: {
+            display() {return "Craft "+(player.r.canCraft[1]>1.5?player.r.canCraft[1]+"x ":"")+tmp.r.dataToRecipe+".\n\n(does nothing yet)"},
+            onClick() {craftItem(recipeIds[player.r.canCraft[0]],player.r.canCraft[1])},
+            canClick(){return tmp.r.dataToRecipe!="nothing"},
+        }
+    },
+    grid: {
+        rows: 3, // If these are dynamic make sure to have a max value as well!
+        cols: 3,
+        getStartData(id) {
+            return ["nothing",0]
+        },
+        getUnlocked(id) { // Default
+            return true
+        },
+        getCanClick(data, id, doThing=false) {
+            if(!doThing)return true
+            if(player.r.removeItem){
+                return data[0]==player.r.cSelected[0]&&data[0]!="nothing"
+            }
+            else{
+                if(data[0]!=player.r.cSelected[0]&&data[0]!="nothing")return false
+                let amt = inventoryItem(player.r.cSelected[0])
+                if(!(amt instanceof ExpantaNum))amt = D(amt)
+                return amt.gt(0.5)
+            }
+        },
+        onClick(data, id) {
+            if(!layers.r.grid.getCanClick(data,id,true))return false
+            if(!player.r.removeItem)addToCraftingGrid(id)
+            else removeFromCraftingGrid(id)
+            let old = player.r.canCraft[0]
+            player.r.canCraft[0]=layers.r.dataToRecipe(player.r.grid)
+        },
+        getDisplay(data, id) {
+            let s = data[0]=="nothing"?[""]:idToRecipe[data[0]].split("-")
+            for(let x=0;x<s.length;x++){
+                s[x]=s[x].charAt(0).toUpperCase()+s[x].slice(1)
+            }
+            s=s.join(" ")
+            if(s=="Scrap")s="Metal "+s
+            if(data[1]>1.5)s=data[1]+"x "+s
+            return s
+        },
+        getStyle(data, id){
+            let s = {"borderRadius":"0px"}
+            if(recipeColors[data[0]])s["backgroundColor"]=recipeColors[data[0]]
+            return s
+        }
+    },
+    bars:{
+        scrapProgress: {
+            direction: LEFT,
+            width: 200,
+            height: 50,
+            progress() { return player.r.scrapTimer==0?1:(player.r.scrapTimer/5)-(player.r.scrapTimer/9) },
+        },
     }
 })

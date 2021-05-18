@@ -25,6 +25,10 @@ addLayer("tree-tab", {
         "Batteries": {
             embedLayer: "b",
             unlocked(){return layers.b.layerShown()}
+        },
+        "Resources": {
+            embedLayer: "r",
+            unlocked(){return layers.r.layerShown()}
         }
         //[["tree", function() {return (layoutInfo.treeLayout ? layoutInfo.treeLayout : TREE_LAYERS)}]]
     }

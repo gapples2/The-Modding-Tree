@@ -12,8 +12,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.002",
-	name: "fuel",
+	num: "0.003",
+	name: "crafting",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
@@ -54,6 +54,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
+	function(){return player.b.total.lt(0.5)?"if you don't see anything to do just grind a little more energy":""}
 ]
 
 // Determines when the game "ends"

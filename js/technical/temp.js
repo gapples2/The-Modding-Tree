@@ -57,7 +57,7 @@ function setupTempData(layerData, tmpData, funcsData) {
 		if (layerData[item] == null) {
 			tmpData[item] = null
 		}
-		else if (layerData[item] instanceof Decimal)
+		else if (layerData[item] instanceof ExpantaNum)
 			tmpData[item] = layerData[item]
 		else if (Array.isArray(layerData[item])) {
 			tmpData[item] = []

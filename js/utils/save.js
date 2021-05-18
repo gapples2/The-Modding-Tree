@@ -135,9 +135,9 @@ function fixSave() {
 
 	for (layer in layers) {
 		if (player[layer].best !== undefined)
-			player[layer].best = new Decimal(player[layer].best);
+			player[layer].best = D(player[layer].best);
 		if (player[layer].total !== undefined)
-			player[layer].total = new Decimal(player[layer].total);
+			player[layer].total = D(player[layer].total);
 
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 
@@ -164,12 +164,17 @@ function fixData(defaultData, newData) {
 			else
 				fixData(defaultData[item], newData[item]);
 		}
-		else if (defaultData[item] instanceof Decimal) { // Convert to Decimal
+		else if (defaultData[item] instanceof ExpantaNum) { // Convert to ExpantaNum
 			if (newData[item] === undefined)
 				newData[item] = defaultData[item];
 
-			else
-				newData[item] = new Decimal(newData[item]);
+			else{
+                let newItemThing=new ExpantaNum(0)
+				newItemThing.array = newData[item].array
+				newItemThing.sign = newData[item].sign
+				newItemThing.layer = newData[item].layer
+                newData[item] = newItemThing
+            } 
 		}
 		else if ((!!defaultData[item]) && (typeof defaultData[item] === "object")) {
 			if (newData[item] === undefined || (typeof defaultData[item] !== "object"))
@@ -189,7 +194,7 @@ function load() {
 	if (get === null || get === undefined)
 		player = getStartPlayer();
 	else
-		player = Object.assign(getStartPlayer(), JSON.parse(decodeURIComponent(escape(atob(get)))));
+		player = Object.assign(getStartPlayer(), JSON.parse(atob(get)));
 	fixSave();
 
 	if (player.offlineProd) {
@@ -236,7 +241,7 @@ function NaNcheck(data) {
 				NaNalert = true;
 			}
 		}
-		else if (data[item] instanceof Decimal) { // Convert to Decimal
+		else if (data[item] instanceof ExpantaNum) { // Convert to ExpantaNum
 		}
 		else if ((!!data[item]) && (data[item].constructor === Object)) {
 			NaNcheck(data[item]);
