@@ -743,12 +743,14 @@ addLayer("r", {
                 ["display-text","Inventory"],
                 "blank",
                 ["layer-proxy",["craftinginvgrid",["grid"]]]
-            ]
+            ],
+            unlocked(){return player.r.unlockedCrafting}
         },
         "Furnace":{
             content:[
-
-            ]
+                
+            ],
+            unlocked(){return player.r.unlocks.includes("furnace")}
         }
     },
     clickables: {

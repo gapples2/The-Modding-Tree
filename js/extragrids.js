@@ -1,4 +1,4 @@
-let gridIdToId = {101:0,102:1}
+let gridIdToId = {101:0,102:1,103:2}
 
 addLayer("craftinginvgrid",{
     startData() { return {
